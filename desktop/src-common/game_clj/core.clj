@@ -17,8 +17,10 @@
   {:karel (place x y)})
 
 (def scenario1
-  [(karel 1 2)
-   {:chip [(place 1 1) (place 0 1) (place 1 0)]}])
+  [(karel 0 0)
+   {:chip [(place 3 1)
+           (place 1 3) 
+           (place 2 4)]}])
 
 (defn get-karel [scenario]
   (:karel (first scenario)))
@@ -46,7 +48,18 @@
                 :height height
                 :x x
                 :y y)))
-                
+
+(defn create-part! [data]
+  (create-entity! create-part-entity! (:screen data) (:x data) (:y data)))
+
+(defn assoc-screen [screen positions]
+    (if (empty? positions)
+      positions
+      (vector (assoc (first positions) :screen screen)
+              (assoc-screen screen (rest positions)))))
+
+(def scenario scenario1)
+
 (defscreen main-screen
   :on-show
   (fn [screen entities]
@@ -56,14 +69,12 @@
                           :world (box-2d 0 0))
           game-w (/ (game :width) pixels-per-tile)
           game-h (/ (game :height) pixels-per-tile)
-          ball (create-entity! create-ball-entity! screen (:x (get-karel scenario1))
-                                                          (:y (get-karel scenario1)))
-          chip1 (create-entity! create-part-entity! screen (:x (first (get-chips scenario1)))
-                                                           (:y (first (get-chips scenario1))))]
+          ball (create-entity! create-ball-entity! screen (:x (get-karel scenario))
+                                                          (:y (get-karel scenario)))]
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [ball chip1]))
+      [ball (map create-part! (flatten (assoc-screen screen (get-chips scenario))))]))
 
   :on-render
   (fn [screen entities]
