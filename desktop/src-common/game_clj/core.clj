@@ -48,8 +48,10 @@
 
 (defn move [entities command]
   (let [karel (first entities)]
-    (cond (= command "move") (vector (assoc karel :x (+ 1 (:x karel)))
-                                     (rest entities)))))
+    (cond (= command :move) (vector (assoc karel :x (+ 1 (:x karel)))
+                                    (rest entities))
+          (= command :turn) (vector (assoc karel :angle 90)
+                                    (rest entities)))))
 
 (def scenario scenario1)
 
@@ -79,8 +81,8 @@
 
   :on-key-down
   (fn [screen entities]
-    (let [command (cond (key-pressed? :m) "move"
-                        (key-pressed? :t) "turn"
+    (let [command (cond (key-pressed? :m) :move
+                        (key-pressed? :t) :turn
                         :else "")]
         (move entities command))))
 
