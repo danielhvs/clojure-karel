@@ -19,7 +19,7 @@
 (def scenario1
   [(karel 0 0)
    {:chip [(place 3 1)
-           (place 1 3) 
+           (place 1 3)
            (place 2 4)]}])
 
 (defn get-karel [scenario]
@@ -28,29 +28,20 @@
 (defn get-chips [scenario]
   (:chip (first (rest scenario))))
 
-(defn create-entity! [create-fn! screen x y]
-  (create-fn! screen x y))
-
-(defn create-part-entity!
-  [screen x y]
-  (let [part (texture "circle32.png")
+(defn create-texture-entity!
+  [png screen x y]
+  (let [part (texture png)
         width (/ (texture! part :get-region-width) pixels-per-tile)
         height (/ (texture! part :get-region-height) pixels-per-tile)]
     (assoc part :width width :x x :y y
                 :height height)))
 
-(defn create-ball-entity!
-  [screen x y]
-  (let [ball (texture "head.png")
-        width (/ (texture! ball :get-region-width) pixels-per-tile)
-        height (/ (texture! ball :get-region-height) pixels-per-tile)]
-    (assoc ball :width width
-                :height height
-                :x x
-                :y y)))
+
+(defn create-entity! [png screen x y]
+  (create-texture-entity! png screen x y))
 
 (defn create-part! [data]
-  (create-entity! create-part-entity! (:screen data) (:x data) (:y data)))
+  (create-entity! "circle32.png" (:screen data) (:x data) (:y data)))
 
 (defn assoc-screen [screen positions]
     (if (empty? positions)
@@ -69,7 +60,7 @@
                           :world (box-2d 0 0))
           game-w (/ (game :width) pixels-per-tile)
           game-h (/ (game :height) pixels-per-tile)
-          ball (create-entity! create-ball-entity! screen (:x (get-karel scenario))
+          ball (create-entity! "head.png" screen (:x (get-karel scenario))
                                                           (:y (get-karel scenario)))]
       ; set the screen width in tiles
       (width! screen game-w)
