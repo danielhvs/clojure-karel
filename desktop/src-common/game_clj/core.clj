@@ -7,8 +7,6 @@
   (:import [com.badlogic.gdx.physics.box2d Filter]))
 
 (def ^:const pixels-per-tile 32)
-(def x0 (/ 100 pixels-per-tile))
-(def y0 x0)
 
 (defn place [x y]
   {:x x :y y})
@@ -36,7 +34,6 @@
     (assoc part :width width :x x :y y
                 :height height)))
 
-
 (defn create-entity! [png screen x y]
   (create-texture-entity! png screen x y))
 
@@ -48,6 +45,11 @@
       positions
       (vector (assoc (first positions) :screen screen)
               (assoc-screen screen (rest positions)))))
+
+(defn move [entities command]
+  (let [karel (first entities)]
+    (cond (= command "move") (vector (assoc karel :x (+ 1 (:x karel)))
+                                     (rest entities)))))
 
 (def scenario scenario1)
 
@@ -61,11 +63,12 @@
           game-w (/ (game :width) pixels-per-tile)
           game-h (/ (game :height) pixels-per-tile)
           ball (create-entity! "head.png" screen (:x (get-karel scenario))
-                                                          (:y (get-karel scenario)))]
+                                                 (:y (get-karel scenario)))]
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [ball (map create-part! (flatten (assoc-screen screen (get-chips scenario))))]))
+      [(assoc ball :karel? true)
+       (map create-part! (flatten (assoc-screen screen (get-chips scenario))))]))
 
   :on-render
   (fn [screen entities]
@@ -76,15 +79,10 @@
 
   :on-key-down
   (fn [screen entities]
-    (let [x (cond (key-pressed? :a) -20 (key-pressed? :d) 20 :else 0)
-          y (cond (key-pressed? :s) -20 (key-pressed? :w) 20 :else 0)]
-        entities))
-
-  :on-begin-contact
-  (fn [screen entities]
-    (when-let [entity (first-entity screen entities)]
-      (cond
-        (:floor? entity) entities))))
+    (let [command (cond (key-pressed? :m) "move"
+                        (key-pressed? :t) "turn"
+                        :else "")]
+        (move entities command))))
 
 (defgame game-clj-game
   :on-create
