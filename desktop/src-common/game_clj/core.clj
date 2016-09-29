@@ -9,14 +9,29 @@
 (def ^:const pixels-per-tile 32)
 
 (defn place [x y]
-  {:x x :y y})
+  {:x x :y y :angle 0})
+
+(defn transform [x y angle]
+  (assoc (place x y) :angle angle))
+
+(defn turn [entity degrees]
+  (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
+
+(defn angle->direction [angle]
+  (cond (= angle 0) {:x 1 :y 0}
+        (= angle 90) {:x 0 :y 1}
+        (= angle 180) {:x -1 :y 0}
+        (= angle 270) {:x 0 :y -1}))
+
+(defn new-position [mapxy offset]
+  (assoc mapxy :x (+ (:x mapxy) (:x offset)) :y (+ (:y mapxy) (:y offset))))
 
 (defn karel [x y]
-  {:karel (place x y)})
+  {:karel (transform  x y 0)})
 
 (def scenario1
   [(karel 0 0)
-   {:chip [(place 3 1)
+   {:chip [(place 4 4)(place 4 5)(place 5 6)(place 3 1)
            (place 1 3)
            (place 2 4)]}])
 
@@ -27,18 +42,18 @@
   (:chip (first (rest scenario))))
 
 (defn create-texture-entity!
-  [png screen x y]
+  [png screen x y angle]
   (let [part (texture png)
         width (/ (texture! part :get-region-width) pixels-per-tile)
         height (/ (texture! part :get-region-height) pixels-per-tile)]
-    (assoc part :width width :x x :y y
+    (assoc part :width width :x x :y y :angle angle
                 :height height)))
 
-(defn create-entity! [png screen x y]
-  (create-texture-entity! png screen x y))
+(defn create-entity! [png screen x y angle]
+  (create-texture-entity! png screen x y angle))
 
 (defn create-part! [data]
-  (create-entity! "circle32.png" (:screen data) (:x data) (:y data)))
+  (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data)))
 
 (defn assoc-screen [screen positions]
     (if (empty? positions)
@@ -48,9 +63,9 @@
 
 (defn move [entities command]
   (let [karel (first entities)]
-    (cond (= command :move) (vector (assoc karel :x (+ 1 (:x karel)))
+    (cond (= command :move) (vector (new-position karel (angle->direction (:angle karel)))
                                     (rest entities))
-          (= command :turn) (vector (assoc karel :angle 90)
+          (= command :turn) (vector (turn karel 90)
                                     (rest entities)))))
 
 (def scenario scenario1)
@@ -65,7 +80,8 @@
           game-w (/ (game :width) pixels-per-tile)
           game-h (/ (game :height) pixels-per-tile)
           ball (create-entity! "head.png" screen (:x (get-karel scenario))
-                                                 (:y (get-karel scenario)))]
+                                                 (:y (get-karel scenario))
+                                                 (:angle (get-karel scenario)))]
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
