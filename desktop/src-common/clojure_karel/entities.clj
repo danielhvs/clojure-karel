@@ -1,4 +1,5 @@
-(ns clojure-karel.entities)
+(ns clojure-karel.entities
+  (:require [play-clj.core :as p]))
 
 (defn place [x y]
   {:x x :y y :angle 0})
@@ -40,23 +41,33 @@
     (vector (new-position karel (angle->direction (:angle karel)))
             (rest entities))))
 
-(defn up [entities]
-  (->> (turn entities)
-       (move)
-       (turn)
-       (turn)
-       (turn)))
-(defn down [entities]
-  (->> (turn entities)
-       (turn)
-       (turn)
-       (move)
-       (turn)))
-(defn left [entities]
-  (->> (turn entities)
-       (turn)
-       (move)
-       (turn)
-       (turn)))
-(defn right [entities]
-  (move entities))
+(defn up [screen entities]
+  (let [step 0.125]
+    (p/add-timer! screen :turn step)
+    (p/add-timer! screen :move (* 2 step))
+    (p/add-timer! screen :turn (* 3 step))
+    (p/add-timer! screen :turn (* 4 step))
+    (p/add-timer! screen :turn (* 5 step))
+    entities))
+
+(defn down [screen entities]
+  (let [step 0.125]
+    (p/add-timer! screen :turn step)
+    (p/add-timer! screen :turn (* 2 step))
+    (p/add-timer! screen :turn (* 3 step))
+    (p/add-timer! screen :move (* 4 step))
+    (p/add-timer! screen :turn (* 5 step))
+    entities))
+(defn left [screen entities]
+  (let [step 0.125]
+    (p/add-timer! screen :turn step)
+    (p/add-timer! screen :turn (* 2 step))
+    (p/add-timer! screen :move (* 3 step))
+    (p/add-timer! screen :turn (* 4 step))
+    (p/add-timer! screen :turn (* 5 step))
+    entities))
+
+(defn right [screen entities]
+  (let [step 0.125]
+    (p/add-timer! screen :move step)
+    entities))

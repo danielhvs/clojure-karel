@@ -56,12 +56,18 @@
 
   :on-key-down
   (fn [screen entities]
-    (cond (key-pressed? :up) (k/up entities)
-          (key-pressed? :down) (k/down entities)
-          (key-pressed? :left) (k/left entities)
-          (key-pressed? :right) (k/right entities)
-          :else entities)))
+    (cond (key-pressed? :up) (k/up screen entities)
+          (key-pressed? :down) (k/down screen entities)
+          (key-pressed? :left) (k/left screen entities)
+          (key-pressed? :right) (k/right screen entities)
+          :else entities))
 
+  :on-timer
+  (fn [screen entities]
+    (case (:id screen)
+      :move (k/move entities)
+      :turn (k/turn entities)
+      nil)))
 
 (defgame game-clj-game
   :on-create
