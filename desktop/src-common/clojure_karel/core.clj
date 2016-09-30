@@ -39,20 +39,19 @@
                           :world (box-2d 0 0))
           game-w (/ (game :width) pixels-per-tile)
           game-h (/ (game :height) pixels-per-tile)
-          ball (create-entity! "head.png" screen (:x (k/get-karel scenario))
-                                                 (:y (k/get-karel scenario))
-                                                 (:angle (k/get-karel scenario)))]
+          karel (create-entity! "head.png" screen (:x (k/get-karel scenario))
+                                                  (:y (k/get-karel scenario))
+                                                  (:angle (k/get-karel scenario)))]
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [(assoc ball :karel? true)
+      [(assoc karel :karel? true)
        (map create-part! (flatten (assoc-screen screen (k/get-chips scenario))))]))
 
   :on-render
   (fn [screen entities]
     (clear!)
     (->> entities
-         (step! screen)
          (render! screen)))
 
   :on-key-down
