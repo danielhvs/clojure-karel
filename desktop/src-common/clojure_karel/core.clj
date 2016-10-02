@@ -8,6 +8,18 @@
 
 (def ^:const pixels-per-tile 32)
 
+(defn move-up [screen entities]
+  (k/up screen 1)
+ entities)
+(defn move-down [screen entities]
+   (k/down screen 1)
+  entities)
+(defn move-left [screen entities]
+  (k/left screen 1)
+  entities)
+(defn move-right [screen entities]
+  (k/right screen 1)
+  entities)
 (defn create-texture-entity!
   [png screen x y angle]
   (let [part (texture png)
@@ -56,10 +68,11 @@
 
   :on-key-down
   (fn [screen entities]
-    (cond (key-pressed? :up) (k/up screen entities)
-          (key-pressed? :down) (k/down screen entities)
-          (key-pressed? :left) (k/left screen entities)
-          (key-pressed? :right) (k/right screen entities)
+    (cond (key-pressed? :up) (move-up screen entities)
+          (key-pressed? :down) (move-down screen entities)
+          (key-pressed? :left) (move-left screen entities)
+          (key-pressed? :right) (move-right screen  entities)
+          (key-pressed? :s) (k/solution screen entities)
           :else entities))
 
   :on-timer
