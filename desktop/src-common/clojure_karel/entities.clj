@@ -41,35 +41,33 @@
     (vector (new-position karel (angle->direction (:angle karel)))
             (rest entities))))
 
+(def step 0.05)
+
 (defn up [screen t]
-  (let [step 0.125]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :move (* (+ 1 t) step))
     (p/add-timer! screen :turn (* (+ 2 t) step))
     (p/add-timer! screen :turn (* (+ 3 t) step))
-    (p/add-timer! screen :turn (* (+ 4 t) step)))
+    (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
 
 (defn down [screen t]
-  (let [step 0.125]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :turn (* (+ 1 t) step))
     (p/add-timer! screen :turn (* (+ 2 t) step))
     (p/add-timer! screen :move (* (+ 3 t) step))
-    (p/add-timer! screen :turn (* (+ 4 t) step)))
+    (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
 (defn left [screen t]
-  (let [step 0.125]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :turn (* (+ 1 t) step))
     (p/add-timer! screen :move (* (+ 2 t) step))
     (p/add-timer! screen :turn (* (+ 3 t) step))
-    (p/add-timer! screen :turn (* (+ 4 t) step)))
+    (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
 
 (defn right [screen t]
-  (let [step 0.125]
-    (p/add-timer! screen :move (* t step)))
+    (p/add-timer! screen :move (* t step))
   (+ 1 t))
 
 (defn solution [screen entities]
