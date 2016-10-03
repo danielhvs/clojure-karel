@@ -1,6 +1,8 @@
 (ns clojure-karel.entities
   (:require [play-clj.core :as p]))
 
+(def step 0.05)
+
 (defn place [x y]
   {:x x :y y :angle 0})
 
@@ -21,19 +23,21 @@
 (defn new-position [mapxy offset]
   (assoc mapxy :x (+ (:x mapxy) (:x offset)) :y (+ (:y mapxy) (:y offset))))
 
-(defn karel [x y]
-  {:karel (transform  x y 0)})
-
 (def scenario1
-  [(karel 0 0)
-   {:chip [{:c (place 1 2) :goal (place 3 4)}
-           {:c (place 5 6) :goal (place 7 8)}]}])
+  {:karel (transform  1 1 0)
+   :chip [{:c (place 2 1) :goal (place 6 2)}]
+   :wall [(place 4 1)
+          (place 5 1)
+          (place 6 1)]})
 
 (defn get-karel [scenario]
-  (:karel (first scenario)))
+  (:karel scenario))
 
 (defn get-chips [scenario]
-  (:chip (first (rest scenario))))
+  (:chip scenario))
+
+(defn get-walls [scenario]
+  (:wall scenario))
 
 (defn get-key [chip the-key]
     (if (empty? chip)
@@ -54,8 +58,6 @@
   (let [karel (first entities)]
     (vector (new-position karel (angle->direction (:angle karel)))
             (rest entities))))
-
-(def step 0.05)
 
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
@@ -84,9 +86,11 @@
     (p/add-timer! screen :move (* t step))
   (+ 1 t))
 
-(defn solution [screen entities]
+(defn solution1 [screen entities]
   (->> (right screen 1)
+       (right screen)
        (up screen)
-       (down screen)
-       (left screen))
+       (right screen)
+       (right screen)
+       (right screen))
   entities)

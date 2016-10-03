@@ -6,7 +6,8 @@
             [play-clj.math :refer :all]
             [clojure-karel.entities :as k]))
 
-(def ^:const pixels-per-tile 32)
+(def scenario k/scenario1)
+(def pixels-per-tile 32)
 
 (defn move-up [screen entities]
   (k/up screen 1)
@@ -20,6 +21,7 @@
 (defn move-right [screen entities]
   (k/right screen 1)
   entities)
+
 (defn create-texture-entity!
   [png screen x y angle]
   (let [part (texture png)
@@ -34,16 +36,17 @@
 (defn create-chip! [data]
   (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data)))
 
-(defn create-goals! [data]
+(defn create-goal! [data]
   (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data)))
+
+(defn create-wall! [data]
+    (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data)))
 
 (defn assoc-screen [screen positions]
     (if (empty? positions)
       positions
       (vector (assoc (first positions) :screen screen)
               (assoc-screen screen (rest positions)))))
-
-(def scenario k/scenario1)
 
 (defscreen main-screen
   :on-show
@@ -65,10 +68,15 @@
          (->> (k/get-c scenario)
               (assoc-screen screen)
               (flatten)))
-       (map create-goals!
+       (map create-goal!
          (->> (k/get-goals scenario)
               (assoc-screen screen)
-              (flatten)))]))
+              (flatten)))
+       (map create-wall!
+         (->> (k/get-walls scenario)
+             (assoc-screen screen)
+             (flatten)))]))
+
 
   :on-render
   (fn [screen entities]
@@ -82,7 +90,7 @@
           (key-pressed? :down) (move-down screen entities)
           (key-pressed? :left) (move-left screen entities)
           (key-pressed? :right) (move-right screen  entities)
-          (key-pressed? :s) (k/solution screen entities)
+          (key-pressed? :s) (k/solution1 screen entities)
           :else entities))
 
   :on-timer
