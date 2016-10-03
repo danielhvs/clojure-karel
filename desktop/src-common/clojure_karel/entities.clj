@@ -26,15 +26,29 @@
 
 (def scenario1
   [(karel 0 0)
-   {:chip [(place 4 4)(place 4 5)(place 5 6)(place 3 1)
-           (place 1 3)
-           (place 2 4)]}])
+   {:chip [{:c (place 1 2) :goal (place 3 4)}
+           {:c (place 5 6) :goal (place 7 8)}]}])
 
 (defn get-karel [scenario]
   (:karel (first scenario)))
 
 (defn get-chips [scenario]
   (:chip (first (rest scenario))))
+
+(defn get-key [chip the-key]
+    (if (empty? chip)
+        chip
+        (vector (the-key (first chip)) (get-key (rest chip) the-key))))
+
+(defn get-c [scenario]
+  (-> (get-chips scenario)
+      (get-key :c)
+      (flatten)))
+
+(defn get-goals [scenario]
+  (-> (get-chips scenario)
+      (get-key :goal)
+      (flatten)))
 
 (defn move [entities]
   (let [karel (first entities)]

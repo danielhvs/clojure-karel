@@ -31,8 +31,11 @@
 (defn create-entity! [png screen x y angle]
   (create-texture-entity! png screen x y angle))
 
-(defn create-part! [data]
+(defn create-chip! [data]
   (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data)))
+
+(defn create-goals! [data]
+  (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data)))
 
 (defn assoc-screen [screen positions]
     (if (empty? positions)
@@ -58,7 +61,15 @@
       (width! screen game-w)
       ; return the entities
       [(assoc karel :karel? true)
-       (map create-part! (flatten (assoc-screen screen (k/get-chips scenario))))]))
+       (map create-chip!
+         (->> (k/get-c scenario)
+              (assoc-screen screen)
+              (flatten)))
+       (map create-goals!
+         (->>
+            (k/get-goals scenario)
+            (assoc-screen screen)
+            (flatten)))]))
 
   :on-render
   (fn [screen entities]
