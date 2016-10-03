@@ -23,8 +23,8 @@
 (defn create-texture-entity!
   [png screen x y angle]
   (let [part (texture png)
-        width (/ (texture! part :get-region-width) pixels-per-tile)
-        height (/ (texture! part :get-region-height) pixels-per-tile)]
+        width 1
+        height 1]
     (assoc part :width width :x x :y y :angle angle
                 :height height)))
 
@@ -35,7 +35,7 @@
   (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data)))
 
 (defn create-goals! [data]
-  (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data)))
+  (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data)))
 
 (defn assoc-screen [screen positions]
     (if (empty? positions)
@@ -66,10 +66,9 @@
               (assoc-screen screen)
               (flatten)))
        (map create-goals!
-         (->>
-            (k/get-goals scenario)
-            (assoc-screen screen)
-            (flatten)))]))
+         (->> (k/get-goals scenario)
+              (assoc-screen screen)
+              (flatten)))]))
 
   :on-render
   (fn [screen entities]
