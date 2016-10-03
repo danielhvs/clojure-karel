@@ -65,11 +65,11 @@
       ; return the entities
       [(assoc karel :karel? true)
        (map create-chip!
-         (->> (k/get-c scenario)
+         (->> (k/get-chips scenario :position)
               (assoc-screen screen)
               (flatten)))
        (map create-goal!
-         (->> (k/get-goals scenario)
+         (->> (k/get-chips scenario :goal)
               (assoc-screen screen)
               (flatten)))
        (map create-wall!
