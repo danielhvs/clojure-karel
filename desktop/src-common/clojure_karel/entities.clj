@@ -3,6 +3,9 @@
 
 (def step 0.05)
 
+(defn in? [collection element]
+  (some #(= % element) collection))
+
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
   ([entities] (let [karel (first entities)]
@@ -44,9 +47,13 @@
 
 (defn move [entities]
   (let [karel (first entities)
-        walls (filter :wall? entities)]
-    (vector (new-position karel (angle->direction (:angle karel)))
-            (rest entities))))
+        walls (filter :wall? entities)
+        karel-new-pos (new-position karel (angle->direction (:angle karel)))
+        karel-pos (select-keys karel-new-pos [:x :y])
+        walls-pos (map #(select-keys % [:x :y]) walls)]
+    (if (in? walls-pos karel-pos)
+        entities
+        (vector karel-new-pos (rest entities)))))
 
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
