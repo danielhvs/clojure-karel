@@ -29,6 +29,7 @@
 
 (defn get-karel [scenario]
   (:karel scenario))
+
 (defn vector-of-maps [the-map the-key]
   (-> the-map
       (get-key the-key)
@@ -42,7 +43,8 @@
   (:wall scenario))
 
 (defn move [entities]
-  (let [karel (first entities)]
+  (let [karel (first entities)
+        walls (filter :wall? entities)]
     (vector (new-position karel (angle->direction (:angle karel)))
             (rest entities))))
 

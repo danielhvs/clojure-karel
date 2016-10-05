@@ -40,7 +40,8 @@
   (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data)))
 
 (defn create-wall! [data]
-    (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data)))
+  (assoc (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data))
+         :wall? true))
 
 (defn assoc-screen [screen positions]
     (if (empty? positions)
@@ -104,3 +105,21 @@
   :on-create
   (fn [this]
     (set-screen! this main-screen)))
+
+(defscreen blank-screen
+  :on-render
+  (fn [screen entities]
+    (clear!)))
+
+(set-screen-wrapper! (fn [screen screen-fn]
+                       (try (screen-fn)
+                         (catch Exception e
+                           (.printStackTrace e)
+                           (set-screen! game-clj-game blank-screen)))))
+
+
+; (in-ns 'clojure-karel.core)
+; (on-gl (set-screen! game-clj-game main-screen))
+; (use 'play-clj.repl)
+; (e main-screen)
+; (e! wall? main-screen :x 3 :y 4)
