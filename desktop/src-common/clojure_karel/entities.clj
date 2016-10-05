@@ -3,12 +3,6 @@
 
 (def step 0.05)
 
-(defn place [x y]
-  {:x x :y y :angle 0})
-
-(defn transform [x y angle]
-  (assoc (place x y) :angle angle))
-
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
   ([entities] (let [karel (first entities)]
@@ -24,11 +18,9 @@
   (assoc mapxy :x (+ (:x mapxy) (:x offset)) :y (+ (:y mapxy) (:y offset))))
 
 (def scenario1
-  {:karel (transform  1 1 0)
-   :chip [{:position (place 2 1) :goal (place 6 2)}]
-   :wall [(place 4 1)
-          (place 5 1)
-          (place 6 1)]})
+  {:karel {:x 1 :y 1 :angle 0}
+   :chip [{:position {:x 2 :y 1} :goal {:x 6 :y 2}}]
+   :wall [{:x 4 :y 1} {:x 5 :y 1} {:x 6 :y 1}]})
 
 (defn get-key [chip the-key]
   (if (empty? chip)
