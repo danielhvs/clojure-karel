@@ -9,6 +9,9 @@
 (def scenario k/scenario1)
 (def pixels-per-tile 32)
 
+(defn grab [screen entities]
+  (k/grab screen 1)
+ entities)
 (defn move-up [screen entities]
   (k/up screen 1)
  entities)
@@ -92,6 +95,7 @@
           (key-pressed? :down) (move-down screen entities)
           (key-pressed? :left) (move-left screen entities)
           (key-pressed? :right) (move-right screen  entities)
+          (key-pressed? :g) (grab screen  entities)
           (key-pressed? :s) (k/solution1 screen entities)
           :else entities))
 
