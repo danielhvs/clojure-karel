@@ -55,6 +55,15 @@
         entities
         (vector karel-new-pos (rest entities)))))
 
+(defn pick [entities]
+  (let [karel (first entities)
+        chips (filter :chip? entities)
+        karel-pos (select-keys karel [:x :y])
+        chips-pos (map #(select-keys % [:x :y]) chips)]
+      (if (in? chips-pos karel-pos)
+          (do (println "grabbed") entities)
+          (do (println "did not grab") entities))))
+
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :move (* (+ 1 t) step))
@@ -79,11 +88,16 @@
   (+ 5 t))
 
 (defn right [screen t]
-    (p/add-timer! screen :move (* t step))
+  (p/add-timer! screen :move (* t step))
+  (+ 1 t))
+
+(defn grab [screen t]
+  (p/add-timer! screen :pick (* t step))
   (+ 1 t))
 
 (defn solution1 [screen entities]
   (->> (right screen 1)
+       (grab screen)
        (right screen)
        (up screen)
        (right screen)

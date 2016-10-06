@@ -34,7 +34,8 @@
   (create-texture-entity! png screen x y angle))
 
 (defn create-chip! [data]
-  (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data)))
+  (assoc (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data))
+         :chip? true))
 
 (defn create-goal! [data]
   (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data)))
@@ -99,6 +100,7 @@
     (case (:id screen)
       :move (k/move entities)
       :turn (k/turn entities)
+      :pick (k/pick entities)
       nil)))
 
 (defgame game-clj-game
