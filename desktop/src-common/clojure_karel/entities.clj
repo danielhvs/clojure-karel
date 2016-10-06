@@ -6,6 +6,16 @@
 (defn in? [collection element]
   (some #(= % element) collection))
 
+(defn in-first [collection element]
+  (if (empty? collection)
+    nil
+    (let [chip (first collection)
+          element-pos (select-keys element [:x :y])
+          chip-pos (select-keys chip [:x :y])]
+      (if (= chip-pos element-pos)
+          chip
+          (in-first (rest collection) element)))))
+
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
   ([entities] (let [karel (first entities)]
@@ -58,10 +68,9 @@
 (defn pick [entities]
   (let [karel (first entities)
         chips (filter :chip? entities)
-        karel-pos (select-keys karel [:x :y])
-        chips-pos (map #(select-keys % [:x :y]) chips)]
-      (if (in? chips-pos karel-pos)
-          (do (println "grabbed") entities)
+        grabbed (in-first chips karel)]
+      (if grabbed
+          (do (println grabbed) entities)
           (do (println "did not grab") entities))))
 
 (defn up [screen t]
