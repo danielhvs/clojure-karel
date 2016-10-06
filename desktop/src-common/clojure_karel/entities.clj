@@ -16,6 +16,21 @@
           chip
           (in-first (rest collection) element)))))
 
+(defn grab-chip [chip]
+  (assoc chip :z 1 :moving true))
+
+(defn drop-chip [chip]
+  (assoc chip :z 0))
+
+(defn grab-chips [karel chips]
+  (if (empty? chips)
+      nil
+      (let [karel-pos (select-keys karel [:x :y])
+            chip-pos (select-keys (first chips) [:x :y])]
+          (if (= chip-pos karel-pos)
+              (vector (grab-chip (first chips)) (grab-chips karel (rest chips)))
+              (vector (first chips) (grab-chips karel (rest chips)))))))
+
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
   ([entities] (let [karel (first entities)]
@@ -65,13 +80,14 @@
         entities
         (vector karel-new-pos (rest entities)))))
 
+
 (defn pick [entities]
   (let [karel (first entities)
-        chips (filter :chip? entities)
-        grabbed (in-first chips karel)]
-      (if grabbed
-          (do (println grabbed) entities)
-          (do (println "did not grab") entities))))
+        chips (grab-chips karel (filter :chip? entities))
+        walls (filter :wall? entities)]
+      (do (println chips)
+          (vector karel chips walls))))
+
 
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
