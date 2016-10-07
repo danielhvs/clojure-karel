@@ -14,6 +14,7 @@
                  [org.clojure/clojure "1.8.0"]
                  [play-clj "1.1.1"]]
 
+  :profiles {:user {:plugins [[lein-kibit "0.1.2"]]}}
   :source-paths ["src" "src-common"]
   :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
   :aot [clojure-karel.core.desktop-launcher]
