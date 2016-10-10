@@ -1,4 +1,4 @@
-(ns clojure-karel.core.desktop-launcher
+(ns clojure-karel.desktop-launcher
   (:require [clojure-karel.core :refer :all])
   (:import [com.badlogic.gdx.backends.lwjgl LwjglApplication]
            [org.lwjgl.input Keyboard])
