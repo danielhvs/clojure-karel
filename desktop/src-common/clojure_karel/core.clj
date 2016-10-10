@@ -107,7 +107,7 @@
       :pick (k/pick entities)
       nil)))
 
-(defgame game-clj-game
+(defgame clj-karel-game
   :on-create
   (fn [this]
     (set-screen! this main-screen)))
@@ -121,11 +121,11 @@
                        (try (screen-fn)
                          (catch Exception e
                            (.printStackTrace e)
-                           (set-screen! game-clj-game blank-screen)))))
+                           (set-screen! clj-karel-game blank-screen)))))
 
 
 ; (in-ns 'clojure-karel.core)
-; (on-gl (set-screen! game-clj-game main-screen))
+; (on-gl (set-screen! clj-karel-game main-screen))
 ; (use 'play-clj.repl)
 ; (e main-screen)
 ; (e! wall? main-screen :x 3 :y 4)

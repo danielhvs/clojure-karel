@@ -6,5 +6,5 @@
 
 (defn -main
   []
-  (LwjglApplication. game-clj-game "game-clj" 800 600)
+  (LwjglApplication. clj-karel-game "clojure-karel" 800 600)
   (Keyboard/enableRepeatEvents true))
