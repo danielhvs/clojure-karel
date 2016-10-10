@@ -3,6 +3,10 @@
 
 (def step 0.05)
 
+(defn println-wrapper [f entities]
+  (println f entities)
+  (f entities))
+
 (defn in? [collection element]
   (some #(= % element) collection))
 
@@ -78,13 +82,11 @@
         entities
         (vector karel-new-pos (rest entities)))))
 
-
 (defn pick [entities]
   (let [karel (first entities)
         chips (grab-chips karel (filter :chip? entities))
         walls (filter :wall? entities)
         goals (filter :goal? entities)]
-      (println chips)
       (vector karel chips walls goals)))
 
 
