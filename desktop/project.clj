@@ -14,6 +14,8 @@
                  [org.clojure/clojure "1.8.0"]
                  [play-clj "1.1.1"]]
 
+  :dev-dependencies [[speclj "2.9.0"]]
+  :test-path "spec/"
   :profiles {:dev {:plugins [[lein-kibit "0.1.2"]]}}
   :source-paths ["src" "src-common"]
   :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
