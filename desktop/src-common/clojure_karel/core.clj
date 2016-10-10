@@ -41,7 +41,8 @@
          :chip? true))
 
 (defn create-goal! [data]
-  (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data)))
+  (assoc (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data))
+         :goal? true))
 
 (defn create-wall! [data]
   (assoc (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data))
@@ -86,8 +87,7 @@
   :on-render
   (fn [screen entities]
     (clear!)
-    (->> entities
-         (render! screen)))
+    (render! screen entities))
 
   :on-key-down
   (fn [screen entities]

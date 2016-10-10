@@ -7,8 +7,7 @@
   (some #(= % element) collection))
 
 (defn in-first [collection element]
-  (if (empty? collection)
-    nil
+  (when (seq collection)
     (let [chip (first collection)
           element-pos (select-keys element [:x :y])
           chip-pos (select-keys chip [:x :y])]
@@ -17,14 +16,13 @@
           (in-first (rest collection) element)))))
 
 (defn grab-chip [chip]
-  (assoc chip :z 1 :moving true))
+  (assoc chip :z 1))
 
 (defn drop-chip [chip]
   (assoc chip :z 0))
 
 (defn grab-chips [karel chips]
-  (if (empty? chips)
-      nil
+  (when (seq chips)
       (let [karel-pos (select-keys karel [:x :y])
             chip-pos (select-keys (first chips) [:x :y])]
           (if (= chip-pos karel-pos)
@@ -37,7 +35,7 @@
                 (vector (turn karel 90) (rest entities)))))
 
 (defn angle->direction [angle]
-  (cond (= angle 0) {:x 1 :y 0}
+  (cond (zero? angle) {:x 1 :y 0}
         (= angle 90) {:x 0 :y 1}
         (= angle 180) {:x -1 :y 0}
         (= angle 270) {:x 0 :y -1}))
@@ -84,14 +82,15 @@
 (defn pick [entities]
   (let [karel (first entities)
         chips (grab-chips karel (filter :chip? entities))
-        walls (filter :wall? entities)]
-      (do (println chips)
-          (vector karel chips walls))))
+        walls (filter :wall? entities)
+        goals (filter :goal? entities)]
+      (println chips)
+      (vector karel chips walls goals)))
 
 
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
-    (p/add-timer! screen :move (* (+ 1 t) step))
+    (p/add-timer! screen :move (* (inc t) step))
     (p/add-timer! screen :turn (* (+ 2 t) step))
     (p/add-timer! screen :turn (* (+ 3 t) step))
     (p/add-timer! screen :turn (* (+ 4 t) step))
@@ -99,14 +98,14 @@
 
 (defn down [screen t]
     (p/add-timer! screen :turn (* t step))
-    (p/add-timer! screen :turn (* (+ 1 t) step))
+    (p/add-timer! screen :turn (* (inc t) step))
     (p/add-timer! screen :turn (* (+ 2 t) step))
     (p/add-timer! screen :move (* (+ 3 t) step))
     (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
 (defn left [screen t]
     (p/add-timer! screen :turn (* t step))
-    (p/add-timer! screen :turn (* (+ 1 t) step))
+    (p/add-timer! screen :turn (* (inc t) step))
     (p/add-timer! screen :move (* (+ 2 t) step))
     (p/add-timer! screen :turn (* (+ 3 t) step))
     (p/add-timer! screen :turn (* (+ 4 t) step))
@@ -114,11 +113,11 @@
 
 (defn right [screen t]
   (p/add-timer! screen :move (* t step))
-  (+ 1 t))
+  (inc t))
 
 (defn grab [screen t]
   (p/add-timer! screen :pick (* t step))
-  (+ 1 t))
+  (inc t))
 
 (defn solution1 [screen entities]
   (->> (right screen 1)
