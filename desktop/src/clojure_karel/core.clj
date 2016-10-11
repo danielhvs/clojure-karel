@@ -129,3 +129,5 @@
 ; (use 'play-clj.repl)
 ; (e main-screen)
 ; (e! wall? main-screen :x 3 :y 4)
+; lein nightlight --port 4000
+

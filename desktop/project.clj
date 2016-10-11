@@ -13,7 +13,8 @@
 
   :test-path "spec"
   :profiles {:dev {:plugins [[lein-kibit "0.1.2"]
-                             [speclj "2.5.0"]]
+                             [speclj "2.5.0"]
+                             [nightlight/lein-nightlight "1.0.0"]]
                    :dependencies [[speclj "2.5.0"]]}}
 
   :source-paths ["src"]
