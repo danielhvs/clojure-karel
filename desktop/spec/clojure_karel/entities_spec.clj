@@ -1,32 +1,25 @@
 (ns clojure-karel.entities-spec
-  (:require [speclj.core :refer :all]))
+  (:require [speclj.core :refer :all]
+            [clojure-karel.entities :refer :all]))
 
-(defn equals-5? [n]
-  (= 5 n))
-
-(describe "Understanding Speclj Components"
-  (before-all
-    (println "Start testing"))
-
-  (after-all
-    (println "Finished testing"))
-
+(describe "scenario1 karel moving"
   (before
-    (println "Before each test"))
+    (def entities [{:x 1 :y 1 :angle 0 :karel? true}
+                   {:x 2 :y 1 :chip? true}
+                   {:x 6 :y 2 :goal? true}
+                   {:x 4 :y 1 :wall? true}
+                   {:x 5 :y 1 :wall? true}
+                   {:x 6 :y 1 :wall? true}]))
 
-  (after
-    (println "After each test"))
+  (it "moves karel normally"
+    (let [karel (first (move entities))]
+      (should= {:x 2 :y 1 :angle 0 :karel? true} karel)))
 
-  (it "4 plus 1 equals 5"
-    (println "During 1st Test")
-    (should (equals-5? (+ 4 1))))
+  (it "doesnt move karel if there is a wall in the way"
+    (let [karel (first (->> (move entities)
+                            (move)
+                            (move)))]
+      (should= {:x 3 :y 1 :angle 0 :karel? true} karel))))
 
-  (it "4 plus 2 doesn't equal 5"
-    (println "During 2nd Test")
-    (should-not (equals-5? (+ 4 2))))
-
-  (it "4 plus 2 equals 6"
-    (println "During 3rd Test")
-    (should= 6 (+ 4 2))))
 
 (run-specs)

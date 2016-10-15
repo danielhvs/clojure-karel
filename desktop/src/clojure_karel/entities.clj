@@ -80,7 +80,7 @@
         walls-pos (map #(select-keys % [:x :y]) walls)]
     (if (in? walls-pos karel-pos)
         entities
-        (vector karel-new-pos (rest entities)))))
+        (flatten (vector karel-new-pos (rest entities))))))
 
 (defn pick [entities]
   (let [karel (first entities)
@@ -88,7 +88,6 @@
         walls (filter :wall? entities)
         goals (filter :goal? entities)]
       (vector karel chips walls goals)))
-
 
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))

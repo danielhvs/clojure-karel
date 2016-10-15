@@ -80,8 +80,8 @@
               (flatten)))
        (map create-wall!
          (->> (k/get-walls scenario)
-             (assoc-screen screen)
-             (flatten)))]))
+              (assoc-screen screen)
+              (flatten)))]))
 
 
   :on-render

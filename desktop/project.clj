@@ -1,4 +1,4 @@
-(defproject game-clj "0.0.1-SNAPSHOT"
+(defproject clojure-karel "0.0.1-SNAPSHOT"
   :description "Sandbox"
 
   :dependencies [[com.badlogicgames.gdx/gdx "1.9.3"]
