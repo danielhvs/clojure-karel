@@ -25,34 +25,12 @@
   (k/right screen 1)
   entities)
 
-(defn create-texture-entity!
-  [png screen x y angle]
+(defn create-entity!
+  [png data]
   (let [part (texture png)
         width 1
         height 1]
-    (assoc part :width width :x x :y y :angle angle
-                :height height)))
-
-(defn create-entity! [png screen x y angle]
-  (create-texture-entity! png screen x y angle))
-
-(defn create-chip! [data]
-  (assoc (create-entity! "circle32.png" (:screen data) (:x data) (:y data) (:angle data))
-         :chip? true))
-
-(defn create-goal! [data]
-  (assoc (create-entity! "square.png" (:screen data) (:x data) (:y data) (:angle data))
-         :goal? true))
-
-(defn create-wall! [data]
-  (assoc (create-entity! "box32.png" (:screen data) (:x data) (:y data) (:angle data))
-         :wall? true))
-
-(defn assoc-screen [screen positions]
-    (if (empty? positions)
-      positions
-      (vector (assoc (first positions) :screen screen)
-              (assoc-screen screen (rest positions)))))
+    (assoc (conj part data) :width width :height height)))
 
 (defscreen main-screen
   :on-show
@@ -62,26 +40,23 @@
                           :renderer (stage)
                           :world (box-2d 0 0))
           game-w (/ (game :width) pixels-per-tile)
-          game-h (/ (game :height) pixels-per-tile)
-          karel (create-entity! "head.png" screen (:x (k/get-karel scenario))
-                                                  (:y (k/get-karel scenario))
-                                                  (:angle (k/get-karel scenario)))]
+          game-h (/ (game :height) pixels-per-tile)]
+
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [(assoc karel :karel? true)
-       (map create-chip!
-         (->> (k/get-chips scenario :position)
-              (assoc-screen screen)
-              (flatten)))
-       (map create-goal!
-         (->> (k/get-chips scenario :goal)
-              (assoc-screen screen)
-              (flatten)))
-       (map create-wall!
-         (->> (k/get-walls scenario)
-              (assoc-screen screen)
-              (flatten)))]))
+      [(->> (filter :karel? scenario)
+            (map #(assoc % :screen screen))
+            (map #(create-entity! "head.png" %)))
+       (->> (filter :chip? scenario)
+            (map #(assoc % :screen screen))
+            (map #(create-entity! "circle32.png" %)))
+       (->> (filter :goal? scenario)
+            (map #(assoc % :screen screen))
+            (map #(create-entity! "square.png" %)))
+       (->> (filter :wall? scenario)
+            (map #(assoc % :screen screen))
+            (map #(create-entity! "box32.png" %)))]))
 
 
   :on-render

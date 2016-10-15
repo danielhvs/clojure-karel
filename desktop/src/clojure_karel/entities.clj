@@ -48,9 +48,12 @@
   (assoc mapxy :x (+ (:x mapxy) (:x offset)) :y (+ (:y mapxy) (:y offset))))
 
 (def scenario1
-  {:karel {:x 1 :y 1 :angle 0}
-   :chip [{:position {:x 2 :y 1} :goal {:x 6 :y 2}}]
-   :wall [{:x 4 :y 1} {:x 5 :y 1} {:x 6 :y 1}]})
+  [{:x 1 :y 1 :angle 0 :karel? true}
+   {:x 2 :y 1 :chip? true}
+   {:x 6 :y 2 :goal? true}
+   {:x 4 :y 1 :wall? true}
+   {:x 5 :y 1 :wall? true}
+   {:x 6 :y 1 :wall? true}])
 
 (defn get-key [chip the-key]
   (if (empty? chip)
@@ -58,7 +61,7 @@
       (vector (the-key (first chip)) (get-key (rest chip) the-key))))
 
 (defn get-karel [scenario]
-  (:karel scenario))
+  (first scenario))
 
 (defn vector-of-maps [the-map the-key]
   (-> the-map
