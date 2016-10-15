@@ -10,15 +10,6 @@
 (defn in? [collection element]
   (some #(= % element) collection))
 
-(defn in-first [collection element]
-  (when (seq collection)
-    (let [chip (first collection)
-          element-pos (select-keys element [:x :y])
-          chip-pos (select-keys chip [:x :y])]
-      (if (= chip-pos element-pos)
-          chip
-          (in-first (rest collection) element)))))
-
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
   ([entities] (let [karel (first entities)]
@@ -54,26 +45,6 @@
             {:x 2 :y 1 :chip? true}
             {:x 6 :y 2 :goal? true}
             (make-walls-scenario1)]))
-
-(defn get-key [chip the-key]
-  (if (empty? chip)
-      chip
-      (vector (the-key (first chip)) (get-key (rest chip) the-key))))
-
-(defn get-karel [scenario]
-  (first scenario))
-
-(defn vector-of-maps [the-map the-key]
-  (-> the-map
-      (get-key the-key)
-      (flatten)))
-
-(defn get-chips
-  ([scenario] (:chip scenario))
-  ([scenario the-key] (vector-of-maps (get-chips scenario) the-key)))
-
-(defn get-walls [scenario]
-  (:wall scenario))
 
 (defn move [entities]
   (let [karel (first entities)
