@@ -47,13 +47,27 @@
 (defn new-position [mapxy offset]
   (assoc mapxy :x (+ (:x mapxy) (:x offset)) :y (+ (:y mapxy) (:y offset))))
 
+(defn make-wall [x y]
+  {:x x :y y :wall? true})
+
+(defn make-walls-scenario1 []
+  (let [bottom (for [xs (take 7 (range))] (conj (make-wall xs 0)))
+        right (for [ys (take 4 (range))] (conj (make-wall 7 ys)))
+        up (for [xs (take 7 (range))] (conj (make-wall xs 3)))
+        left (for [ys [1 2]] (conj (make-wall 0 ys)))]
+    (-> bottom
+        (conj right)
+        (conj up)
+        (conj left)
+        (conj (make-wall 4 1))
+        (conj (make-wall 5 1))
+        (conj (make-wall 6 1)))))
+
 (def scenario1
-  [{:x 1 :y 1 :angle 0 :karel? true}
-   {:x 2 :y 1 :chip? true}
-   {:x 6 :y 2 :goal? true}
-   {:x 4 :y 1 :wall? true}
-   {:x 5 :y 1 :wall? true}
-   {:x 6 :y 1 :wall? true}])
+  (flatten [{:x 1 :y 1 :angle 0 :karel? true}
+            {:x 2 :y 1 :chip? true}
+            {:x 6 :y 2 :goal? true}
+            (make-walls-scenario1)]))
 
 (defn get-key [chip the-key]
   (if (empty? chip)
