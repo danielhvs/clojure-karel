@@ -66,7 +66,7 @@
           (key-pressed? :down) (move-down screen entities)
           (key-pressed? :left) (move-left screen entities)
           (key-pressed? :right) (move-right screen  entities)
-          (key-pressed? :g) (grab screen  entities)
+          (key-pressed? :g) (grab screen entities)
           (key-pressed? :s) (k/solution1 screen entities)
           :else (k/println-wrapper identity entities)))
 
