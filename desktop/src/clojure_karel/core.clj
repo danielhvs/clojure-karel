@@ -32,6 +32,11 @@
         height 1]
     (assoc (conj part data) :width width :height height)))
 
+(defn create-game-entity! [key-code screen png]
+  (->> (filter key-code scenario)
+       (map #(assoc % :screen screen))
+       (map #(create-entity! png %))))
+
 (defscreen main-screen
   :on-show
   (fn [screen entities]
@@ -45,19 +50,10 @@
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [(->> (filter :karel? scenario)
-            (map #(assoc % :screen screen))
-            (map #(create-entity! "head.png" %)))
-       (->> (filter :chip? scenario)
-            (map #(assoc % :screen screen))
-            (map #(create-entity! "circle32.png" %)))
-       (->> (filter :goal? scenario)
-            (map #(assoc % :screen screen))
-            (map #(create-entity! "square.png" %)))
-       (->> (filter :wall? scenario)
-            (map #(assoc % :screen screen))
-            (map #(create-entity! "box32.png" %)))]))
-
+      [(create-game-entity! :karel? screen "head.png")
+       (create-game-entity! :chip? screen "circle32.png")
+       (create-game-entity! :goal? screen "square.png")
+       (create-game-entity! :wall? screen "box32.png")]))
 
   :on-render
   (fn [screen entities]
