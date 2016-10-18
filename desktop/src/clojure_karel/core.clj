@@ -12,6 +12,9 @@
 (defn grab [screen entities]
   (k/grab screen 1)
  entities)
+(defn leave [screen entities]
+  (k/leave screen 1)
+ entities)
 (defn move-up [screen entities]
   (k/up screen 1)
  entities)
@@ -50,8 +53,8 @@
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [(create-game-entity! :karel? screen "head.png")
-       (create-game-entity! :chip? screen "circle32.png")
+      [(create-game-entity! :chip? screen "circle32.png")
+       (create-game-entity! :karel? screen "head.png")
        (create-game-entity! :goal? screen "square.png")
        (create-game-entity! :wall? screen "box32.png")]))
 
@@ -67,8 +70,9 @@
           (key-pressed? :left) (move-left screen entities)
           (key-pressed? :right) (move-right screen  entities)
           (key-pressed? :g) (grab screen entities)
+          (key-pressed? :d) (leave screen entities)
           (key-pressed? :s) (k/solution1 screen entities)
-          :else (k/println-wrapper identity entities)))
+          :else entities))
 
   :on-timer
   (fn [screen entities]
@@ -76,6 +80,7 @@
       :move (k/move entities)
       :turn (k/turn entities)
       :pick (k/pick entities)
+      :drop (k/_drop entities)
       nil)))
 
 (defgame clj-karel-game

@@ -12,8 +12,7 @@
 
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
-  ([entities] (let [karel (first entities)]
-                (vector (turn karel 90) (rest entities)))))
+  ([entities] (map #(if (:karel? %) (turn % 90) %) entities)))
 
 (defn angle->direction [angle]
   (cond (zero? angle) {:x 1 :y 0}
@@ -21,11 +20,11 @@
         (= angle 180) {:x -1 :y 0}
         (= angle 270) {:x 0 :y -1}))
 
-(defn new-position [mapxy offset]
-  (assoc mapxy :x (+ (:x mapxy) (:x offset)) :y (+ (:y mapxy) (:y offset))))
+(defn new-position [entity offset]
+  (assoc entity :x (+ (:x entity) (:x offset)) :y (+ (:y entity) (:y offset))))
 
 (defn make-wall [x y]
-  {:x x :y y :wall? true})
+  {:x x :y y :z 0 :wall? true})
 
 (defn make-walls-scenario1 []
   (let [bottom (for [xs (take 7 (range))] (conj (make-wall xs 0)))
@@ -41,29 +40,40 @@
         (conj (make-wall 6 1)))))
 
 (def scenario1
-  (flatten [{:x 1 :y 1 :angle 0 :karel? true}
-            {:x 2 :y 1 :chip? true}
-            {:x 6 :y 2 :goal? true}
+  (flatten [{:x 1 :y 1 :z 0 :angle 0 :karel? true}
+            {:x 2 :y 1 :z 0 :chip? true}
+            {:x 6 :y 2 :z 0 :goal? true}
             (make-walls-scenario1)]))
 
 (defn move [entities]
-  (let [karel (first entities)
+  (let [karel (first (filter :karel? entities))
         walls (filter :wall? entities)
         karel-new-pos (new-position karel (angle->direction (:angle karel)))
         karel-pos (select-keys karel-new-pos [:x :y])
         walls-pos (map #(select-keys % [:x :y]) walls)]
-    (if (in? walls-pos karel-pos)
-        entities
-        (flatten (vector karel-new-pos (rest entities))))))
+    (map #(if (:karel? %)
+              (if (in? walls-pos karel-pos) % karel-new-pos)
+              %)
+         entities)))
 
 (defn pick [entities]
-  (let [karel (first entities)
-        chips (filter :chip? entities)
+  (let [karel (first (filter :karel? entities))
         karel-pos (select-keys karel [:x :y])]
+    (sort-by :z <
       (map #(if (= karel-pos (select-keys % [:x :y]))
-                (assoc % :z 1)
+                (if (:chip? %) (assoc % :z 1) %)
                 %)
-           entities)))
+           entities))))
+
+(defn _drop [entities]
+  (let [karel (first (filter :karel? entities))
+        karel-pos (select-keys karel [:x :y])]
+    (println "dropping")
+    (sort-by :z <
+      (map #(if (= karel-pos (select-keys % [:x :y]))
+                (if (:chip? %) (assoc % :z -1) %)
+                %)
+           entities))))
 
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
@@ -94,6 +104,10 @@
 
 (defn grab [screen t]
   (p/add-timer! screen :pick (* t step))
+  (inc t))
+
+(defn leave [screen t]
+  (p/add-timer! screen :drop (* t step))
   (inc t))
 
 (defn solution1 [screen entities]
