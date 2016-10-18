@@ -1,7 +1,7 @@
 (ns clojure-karel.entities
   (:require [play-clj.core :as p]))
 
-(def step 0.05)
+(def step 0.1)
 
 (defn println-wrapper [f entities]
   (println f entities)
@@ -12,7 +12,7 @@
 
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
-  ([entities] (map #(if (:karel? %) (turn % 90) %) entities)))
+  ([entities] (map #(if (:moving? %) (turn % 90) %) entities)))
 
 (defn angle->direction [angle]
   (cond (zero? angle) {:x 1 :y 0}
@@ -40,8 +40,8 @@
         (conj (make-wall 6 1)))))
 
 (def scenario1
-  (flatten [{:x 1 :y 1 :z 0 :angle 0 :karel? true}
-            {:x 2 :y 1 :z 0 :chip? true}
+  (flatten [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}
+            {:x 2 :y 1 :z 0 :angle 0 :chip? true}
             {:x 6 :y 2 :z 0 :goal? true}
             (make-walls-scenario1)]))
 
@@ -51,8 +51,10 @@
         karel-new-pos (new-position karel (angle->direction (:angle karel)))
         karel-pos (select-keys karel-new-pos [:x :y])
         walls-pos (map #(select-keys % [:x :y]) walls)]
-    (map #(if (:karel? %)
-              (if (in? walls-pos karel-pos) % karel-new-pos)
+    (map #(if (:moving? %)
+              (let [new-pos (new-position % (angle->direction (:angle %)))
+                    pos (select-keys new-pos [:x :y])]
+                (if (in? walls-pos pos) % new-pos))
               %)
          entities)))
 
@@ -61,17 +63,16 @@
         karel-pos (select-keys karel [:x :y])]
     (sort-by :z <
       (map #(if (= karel-pos (select-keys % [:x :y]))
-                (if (:chip? %) (assoc % :z 1) %)
+                (if (:chip? %) (assoc % :z 1 :moving? true) %)
                 %)
            entities))))
 
 (defn _drop [entities]
   (let [karel (first (filter :karel? entities))
         karel-pos (select-keys karel [:x :y])]
-    (println "dropping")
     (sort-by :z <
       (map #(if (= karel-pos (select-keys % [:x :y]))
-                (if (:chip? %) (assoc % :z -1) %)
+                (if (:chip? %) (assoc % :z -1 :moving? false) %)
                 %)
            entities))))
 
@@ -117,5 +118,6 @@
        (up screen)
        (right screen)
        (right screen)
-       (right screen))
+       (right screen)
+       (leave screen))
   entities)
