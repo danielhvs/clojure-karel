@@ -6,7 +6,6 @@
             [play-clj.math :refer :all]
             [clojure-karel.entities :as k]))
 
-(def scenario k/scenario1)
 (def pixels-per-tile 32)
 
 (defn grab [screen entities]
@@ -35,10 +34,16 @@
         height 1]
     (assoc (conj part data) :width width :height height)))
 
-(defn create-game-entity! [key-code screen png]
+(defn create-game-entity! [scenario key-code screen png]
   (->> (filter key-code scenario)
        (map #(assoc % :screen screen))
        (map #(create-entity! png %))))
+
+(defn create-scenario [scenario screen]
+  [(create-game-entity! scenario :chip? screen "circle32.png")
+   (create-game-entity! scenario :karel? screen "head.png")
+   (create-game-entity! scenario :goal? screen "square.png")
+   (create-game-entity! scenario :wall? screen "box32.png")])
 
 (defscreen main-screen
   :on-show
@@ -53,10 +58,7 @@
       ; set the screen width in tiles
       (width! screen game-w)
       ; return the entities
-      [(create-game-entity! :chip? screen "circle32.png")
-       (create-game-entity! :karel? screen "head.png")
-       (create-game-entity! :goal? screen "square.png")
-       (create-game-entity! :wall? screen "box32.png")]))
+      (create-scenario k/scenario1 screen)))
 
   :on-render
   (fn [screen entities]
@@ -71,7 +73,9 @@
           (key-pressed? :right) (move-right screen  entities)
           (key-pressed? :g) (grab screen entities)
           (key-pressed? :d) (leave screen entities)
-          (key-pressed? :s) (k/solution1 screen entities)
+          (key-pressed? :a) (k/solution1 screen entities)
+          (key-pressed? :q) (create-scenario k/scenario1 screen)
+          (key-pressed? :w) (create-scenario k/scenario2 screen)
           :else entities))
 
   :on-timer

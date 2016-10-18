@@ -23,10 +23,17 @@
 (defn new-position [entity offset]
   (assoc entity :x (+ (:x entity) (:x offset)) :y (+ (:y entity) (:y offset))))
 
-(defn make-wall [x y]
-  {:x x :y y :z 0 :wall? true})
+(defn make-entity [x y filter-code]
+  {:x x :y y :z 0 :angle 0 filter-code true})
 
-(defn make-walls-scenario1 []
+(defn make-wall [x y]
+  (make-entity x y :wall?))
+(defn make-chip [x y]
+  (make-entity x y :chip?))
+(defn make-goal [x y]
+  (make-entity x y :goal?))
+
+(def walls-scenario1
   (let [bottom (for [xs (take 7 (range))] (conj (make-wall xs 0)))
         right (for [ys (take 4 (range))] (conj (make-wall 7 ys)))
         up (for [xs (take 7 (range))] (conj (make-wall xs 3)))
@@ -43,7 +50,34 @@
   (flatten [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}
             {:x 2 :y 1 :z 0 :angle 0 :chip? true}
             {:x 6 :y 2 :z 0 :goal? true}
-            (make-walls-scenario1)]))
+            walls-scenario1]))
+
+(def walls-scenario2
+  (let [bottom (for [xs (take 11 (range))] (conj (make-wall xs 0)))
+        right (for [ys (take 5 (range))] (conj (make-wall 10 ys)))
+        up (for [xs (take 11 (range))] (conj (make-wall xs 4)))
+        left (for [ys (take 5 (range))] (conj (make-wall 0 ys)))]
+    (-> bottom
+        (conj right)
+        (conj up)
+        (conj left)
+        (conj (for [xs (->> (range)
+                            (take 10)
+                            (filter odd?))]
+                (conj (make-wall xs 1)))))))
+
+(def scenario2
+  (flatten [{:x 1 :y 2 :z 0 :angle 0 :karel? true :moving? true}
+            (for [xs (->> (range)
+                          (take 10)
+                          (filter odd?))]
+              (conj (make-chip xs 3)))
+            (for [xs (->> (range)
+                          (take 10)
+                          (filter even?)
+                          (remove zero?))]
+              (conj (make-goal xs 1)))
+            walls-scenario2]))
 
 (defn move [entities]
   (let [karel (first (filter :karel? entities))
