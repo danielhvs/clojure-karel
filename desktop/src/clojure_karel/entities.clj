@@ -1,7 +1,7 @@
 (ns clojure-karel.entities
   (:require [play-clj.core :as p]))
 
-(def step 0.1)
+(def step 0.05)
 
 (defn println-wrapper [f entities]
   (println f entities)
@@ -69,7 +69,7 @@
 (def scenario2
   (flatten [{:x 1 :y 2 :z 0 :angle 0 :karel? true :moving? true}
             (for [xs (->> (range)
-                          (take 10)
+                          (take 9)
                           (filter odd?))]
               (conj (make-chip xs 3)))
             (for [xs (->> (range)
@@ -154,4 +154,23 @@
        (right screen)
        (right screen)
        (leave screen))
+  entities)
+
+(defn iterate-solution2
+ ([screen] (iterate-solution2 screen 1))
+ ([screen t]
+   (->> (up screen t)
+        (grab screen)
+        (right screen)
+        (down screen)
+        (down screen)
+        (leave screen)
+        (up screen)
+        (right screen))))
+
+(defn solution2 [screen entities]
+  (->> (iterate-solution2 screen)
+       (iterate-solution2 screen)
+       (iterate-solution2 screen)
+       (iterate-solution2 screen))
   entities)

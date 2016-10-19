@@ -73,9 +73,10 @@
           (key-pressed? :right) (move-right screen  entities)
           (key-pressed? :g) (grab screen entities)
           (key-pressed? :d) (leave screen entities)
-          (key-pressed? :a) (k/solution1 screen entities)
           (key-pressed? :q) (create-scenario k/scenario1 screen)
+          (key-pressed? :a) (k/solution1 screen entities)
           (key-pressed? :w) (create-scenario k/scenario2 screen)
+          (key-pressed? :s) (k/solution2 screen entities)
           :else entities))
 
   :on-timer
