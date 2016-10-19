@@ -79,6 +79,23 @@
               (conj (make-goal xs 1)))
             walls-scenario2]))
 
+(def walls-scenario3
+  (let [bottom (for [xs (take 11 (range))] (conj (make-wall xs 0)))
+        right (for [ys (take 9 (range))] (conj (make-wall 10 ys)))
+        up (for [xs (take 11 (range))] (conj (make-wall xs 8)))
+        left (for [ys (take 9 (range))] (conj (make-wall 0 ys)))]
+    (-> bottom
+        (conj right)
+        (conj up)
+        (conj left))))
+
+(def scenario3
+  (flatten [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}
+            (let [chip-positions [{:x 2 :y 3} {:x 3 :y 5} {:x 4 :y 2}{:x 5 :y 3} {:x 6 :y 6} {:x 8 :y 2}]]
+              (map #(for [y (range 1 (inc (:y %)))] (make-chip (:x %) y)) chip-positions))
+            (make-goal 9 1)
+            walls-scenario3]))
+
 (defn move [entities]
   (let [karel (first (filter :karel? entities))
         walls (filter :wall? entities)
@@ -158,15 +175,14 @@
 
 (defn iterate-solution2
  ([screen] (iterate-solution2 screen 1))
- ([screen t]
-   (->> (up screen t)
-        (grab screen)
-        (right screen)
-        (down screen)
-        (down screen)
-        (leave screen)
-        (up screen)
-        (right screen))))
+ ([screen t] (->> (up screen t)
+                  (grab screen)
+                  (right screen)
+                  (down screen)
+                  (down screen)
+                  (leave screen)
+                  (up screen)
+                  (right screen))))
 
 (defn solution2 [screen entities]
   (->> (iterate-solution2 screen)
