@@ -8,7 +8,8 @@
   (f entities))
 
 (defn in? [collection element]
-  (some #(= % element) collection))
+  (->> (some #(= % element) collection)
+       (some?)))
 
 (defn turn
   ([entity degrees] (assoc entity :angle (mod (+ (:angle entity) degrees) 360)))
@@ -19,6 +20,13 @@
         (= angle 90) {:x 0 :y 1}
         (= angle 180) {:x -1 :y 0}
         (= angle 270) {:x 0 :y -1}))
+
+(defn karel-find-chip [entities]
+  (let [karel (->> entities (filter :karel?) first)
+        not-moving-chips (->> entities (filter :chip?) (remove :moving?))
+        karel-pos (select-keys karel [:x :y])
+        chips-pos (map #(select-keys % [:x :y]) not-moving-chips)]
+    (in? chips-pos karel-pos)))
 
 (defn new-position [entity offset]
   (assoc entity :x (+ (:x entity) (:x offset)) :y (+ (:y entity) (:y offset))))
@@ -177,8 +185,8 @@
  ([screen] (iterate-solution2 screen 1))
  ([screen t] (->> (up screen t)
                   (grab screen)
-                  (right screen)
                   (down screen)
+                  (right screen)
                   (down screen)
                   (leave screen)
                   (up screen)

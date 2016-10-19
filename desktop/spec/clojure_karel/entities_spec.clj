@@ -38,5 +38,18 @@
     (let [chip (first (filter :chip? (pick entities)))]
       (should= {:x 1 :y 1 :z 1 :chip? true :moving? true} chip))))
 
+(describe "detect chips:"
+  (before
+    (def entities [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}
+                   {:x 1 :y 1 :z 0 :chip? true}]))
+
+
+  (it "karel detects when there is a chip"
+      (should= true (karel-find-chip entities)))
+  (it "karel doesn't detects when it is grabbing a chip"
+      (should= false (karel-find-chip (pick entities))))
+  (it "karel doesn't detects when there isn't a chip"
+      (should= false (karel-find-chip (move entities)))))
+
 
 (run-specs)
