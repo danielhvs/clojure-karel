@@ -1,7 +1,8 @@
 (ns clojure-karel.entities
-  (:require [play-clj.core :as p]))
+  (:require [play-clj.core :as p]
+            [clojure.pprint :refer :all]))
 
-(def step 0.05)
+(def step 0.025)
 
 (defn println-wrapper [f entities]
   (println f entities)
@@ -222,19 +223,48 @@
        (iterate-solution2 screen))
   entities)
 
-; FIXME: detect walls to stop iterating
 (defn iterate-solution3
   ([screen entities] (iterate-solution3 screen entities 1))
-  ([screen entities t]
-    (if (karel-find-chip? entities)
-        (let [time (->> (grab screen t) (up screen))
-              next-state (->> (_grab entities) (_up))]
-          (iterate-solution3 screen next-state time))
-        (let [time (->> (down screen t))
-              next-state (->> (_down entities))]
-          (iterate-solution3 screen next-state time)))))
+  ([screen entities t] (if (karel-find-chip? entities)
+                           (let [time (->> (grab screen t) (up screen))
+                                 next-state (->> (_grab entities) (_up))]
+                              (iterate-solution3 screen next-state time))
+                           (let [time (->> (down screen t))
+                                 next-state (->> (_down entities))]
+                              (if (= next-state entities)
+                                  time
+                                  (iterate-solution3 screen next-state time))))))
+
+(defn next-state3 [entities]
+  (if (karel-find-chip? entities)
+      (let [next-state (->> (_grab entities) (_up))]
+        (next-state3 next-state))
+      (let [next-state (->> (_down entities))]
+        (if (= next-state entities)
+            (_right entities)
+            (next-state3 next-state)))))
+
+(defn karel-print [entitites]
+  (pprint (filter :karel? entitites)))
 
 (defn solution3 [screen entities]
-  (right screen 1)
-  (future (Thread/sleep (* 2 step)) (iterate-solution3 screen (_right entities)))
-  entities)
+  (let [x (_right entities)
+        states (take 8 (iterate next-state3 x))]
+    (->> (right screen 1)
+         (iterate-solution3 screen (nth states 0))
+         (right screen)
+         (iterate-solution3 screen (nth states 1))
+         (right screen)
+         (iterate-solution3 screen (nth states 2))
+         (right screen)
+         (iterate-solution3 screen (nth states 3))
+         (right screen)
+         (iterate-solution3 screen (nth states 4))
+         (right screen)
+         (iterate-solution3 screen (nth states 5))
+         (right screen)
+         (iterate-solution3 screen (nth states 6))
+         (right screen)
+         (iterate-solution3 screen (nth states 7))
+         (leave screen))
+    entities))
