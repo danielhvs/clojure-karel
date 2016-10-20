@@ -1,5 +1,6 @@
 (ns clojure-karel.core
   (:require [play-clj.core :refer :all]
+            [clojure.pprint :refer :all]
             [play-clj.ui :refer :all]
             [play-clj.g2d :refer :all]
             [play-clj.g2d-physics :refer :all]
@@ -72,13 +73,14 @@
           (key-pressed? :left) (move-left screen entities)
           (key-pressed? :right) (move-right screen  entities)
           (key-pressed? :g) (grab screen entities)
-          (key-pressed? :d) (leave screen entities)
+          (key-pressed? :h) (leave screen entities)
           (key-pressed? :q) (create-scenario k/scenario1 screen)
           (key-pressed? :a) (k/solution1 screen entities)
           (key-pressed? :w) (create-scenario k/scenario2 screen)
           (key-pressed? :s) (k/solution2 screen entities)
           (key-pressed? :e) (create-scenario k/scenario3 screen)
-          :else entities))
+          (key-pressed? :d) (k/solution3 screen entities)
+          :else (pprint entities)))
 
   :on-timer
   (fn [screen entities]
@@ -112,4 +114,3 @@
 ; (e main-screen)
 ; (e! wall? main-screen :x 3 :y 4)
 ; lein nightlight --port 4000
-

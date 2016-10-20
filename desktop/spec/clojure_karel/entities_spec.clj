@@ -45,11 +45,11 @@
 
 
   (it "karel detects when there is a chip"
-      (should= true (karel-find-chip entities)))
+      (should= true (karel-find-chip? entities)))
   (it "karel doesn't detects when it is grabbing a chip"
-      (should= false (karel-find-chip (pick entities))))
+      (should= false (karel-find-chip? (pick entities))))
   (it "karel doesn't detects when there isn't a chip"
-      (should= false (karel-find-chip (move entities)))))
+      (should= false (karel-find-chip? (move entities)))))
 
 
 (run-specs)

@@ -21,7 +21,7 @@
         (= angle 180) {:x -1 :y 0}
         (= angle 270) {:x 0 :y -1}))
 
-(defn karel-find-chip [entities]
+(defn karel-find-chip? [entities]
   (let [karel (->> entities (filter :karel?) first)
         not-moving-chips (->> entities (filter :chip?) (remove :moving?))
         karel-pos (select-keys karel [:x :y])
@@ -135,6 +135,12 @@
                 %)
            entities))))
 
+(defn _up [entities]
+  (->> (turn entities)
+       (move)
+       (turn)
+       (turn)
+       (turn)))
 (defn up [screen t]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :move (* (inc t) step))
@@ -143,6 +149,12 @@
     (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
 
+(defn _down [entities]
+  (->> (turn entities)
+       (turn)
+       (turn)
+       (move)
+       (turn)))
 (defn down [screen t]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :turn (* (inc t) step))
@@ -150,6 +162,13 @@
     (p/add-timer! screen :move (* (+ 3 t) step))
     (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
+
+(defn _left [entities]
+  (->> (turn entities)
+       (turn)
+       (move)
+       (turn)
+       (turn)))
 (defn left [screen t]
     (p/add-timer! screen :turn (* t step))
     (p/add-timer! screen :turn (* (inc t) step))
@@ -158,10 +177,14 @@
     (p/add-timer! screen :turn (* (+ 4 t) step))
   (+ 5 t))
 
+(defn _right [entities]
+   (move entities))
 (defn right [screen t]
   (p/add-timer! screen :move (* t step))
   (inc t))
 
+(defn _grab [entities]
+  (pick entities))
 (defn grab [screen t]
   (p/add-timer! screen :pick (* t step))
   (inc t))
@@ -197,4 +220,21 @@
        (iterate-solution2 screen)
        (iterate-solution2 screen)
        (iterate-solution2 screen))
+  entities)
+
+; FIXME: detect walls to stop iterating
+(defn iterate-solution3
+  ([screen entities] (iterate-solution3 screen entities 1))
+  ([screen entities t]
+    (if (karel-find-chip? entities)
+        (let [time (->> (grab screen t) (up screen))
+              next-state (->> (_grab entities) (_up))]
+          (iterate-solution3 screen next-state time))
+        (let [time (->> (down screen t))
+              next-state (->> (_down entities))]
+          (iterate-solution3 screen next-state time)))))
+
+(defn solution3 [screen entities]
+  (right screen 1)
+  (future (Thread/sleep (* 2 step)) (iterate-solution3 screen (_right entities)))
   entities)
