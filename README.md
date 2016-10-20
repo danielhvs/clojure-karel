@@ -13,3 +13,6 @@ Implementing "Karel the Robot Learns Java" in clojure.
 
  * $ cd desktop
  * $ lein run
+ * scenario1 to 3: 'q','w,'e'
+ * solutions1 to 3: 'a','s','d'
+ * controls for testing: arrows, 'g(grab)', 'h(drop)'
