@@ -78,7 +78,7 @@
           (key-pressed? :a) (k/solution1 screen entities)
           (key-pressed? :w) (create-scenario k/scenario2 screen)
           (key-pressed? :s) (k/solution2 screen entities)
-          (key-pressed? :e) (create-scenario k/scenario3 screen)
+          (key-pressed? :e) (create-scenario (k/scenario3) screen)
           (key-pressed? :d) (k/solution3 screen entities)
           :else (pprint entities)))
 

@@ -2,7 +2,7 @@
   (:require [play-clj.core :as p]
             [clojure.pprint :refer :all]))
 
-(def step 0.025)
+(def step 0.005)
 
 (defn println-wrapper [f entities]
   (println f entities)
@@ -98,9 +98,11 @@
         (conj up)
         (conj left))))
 
-(def scenario3
+(defn rand-y-chip [] (inc (rand-int 6)))
+
+(defn scenario3 []
   (flatten [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}
-            (let [chip-positions [{:x 2 :y 3} {:x 3 :y 5} {:x 4 :y 2}{:x 5 :y 3} {:x 6 :y 6} {:x 8 :y 2}]]
+            (let [chip-positions [{:x 2 :y (rand-y-chip)} {:x 3 :y (rand-y-chip)} {:x 4 :y (rand-y-chip)}{:x 5 :y (rand-y-chip)} {:x 6 :y (rand-y-chip)} {:x 8 :y (rand-y-chip)}]]
               (map #(for [y (range 1 (inc (:y %)))] (make-chip (:x %) y)) chip-positions))
             (make-goal 9 1)
             walls-scenario3]))
