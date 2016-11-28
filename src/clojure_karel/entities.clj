@@ -1,12 +1,5 @@
 (ns clojure-karel.entities
-  (:require [play-clj.core :as p]
-            [clojure.pprint :refer :all]))
-
-(def step 0.005)
-
-(defn println-wrapper [f entities]
-  (println f entities)
-  (f entities))
+  (:require [clojure.pprint :refer :all]))
 
 (defn in? [collection element]
   (->> (some #(= % element) collection)
@@ -144,98 +137,22 @@
        (turn)
        (turn)
        (turn)))
-(defn up [screen t]
-    (p/add-timer! screen :turn (* t step))
-    (p/add-timer! screen :move (* (inc t) step))
-    (p/add-timer! screen :turn (* (+ 2 t) step))
-    (p/add-timer! screen :turn (* (+ 3 t) step))
-    (p/add-timer! screen :turn (* (+ 4 t) step))
-  (+ 5 t))
-
 (defn _down [entities]
   (->> (turn entities)
        (turn)
        (turn)
        (move)
        (turn)))
-(defn down [screen t]
-    (p/add-timer! screen :turn (* t step))
-    (p/add-timer! screen :turn (* (inc t) step))
-    (p/add-timer! screen :turn (* (+ 2 t) step))
-    (p/add-timer! screen :move (* (+ 3 t) step))
-    (p/add-timer! screen :turn (* (+ 4 t) step))
-  (+ 5 t))
-
 (defn _left [entities]
   (->> (turn entities)
        (turn)
        (move)
        (turn)
        (turn)))
-(defn left [screen t]
-    (p/add-timer! screen :turn (* t step))
-    (p/add-timer! screen :turn (* (inc t) step))
-    (p/add-timer! screen :move (* (+ 2 t) step))
-    (p/add-timer! screen :turn (* (+ 3 t) step))
-    (p/add-timer! screen :turn (* (+ 4 t) step))
-  (+ 5 t))
-
 (defn _right [entities]
    (move entities))
-(defn right [screen t]
-  (p/add-timer! screen :move (* t step))
-  (inc t))
-
 (defn _grab [entities]
   (pick entities))
-(defn grab [screen t]
-  (p/add-timer! screen :pick (* t step))
-  (inc t))
-
-(defn leave [screen t]
-  (p/add-timer! screen :drop (* t step))
-  (inc t))
-
-(defn solution1 [screen entities]
-  (->> (right screen 1)
-       (grab screen)
-       (right screen)
-       (up screen)
-       (right screen)
-       (right screen)
-       (right screen)
-       (leave screen))
-  entities)
-
-(defn iterate-solution2
- ([screen] (iterate-solution2 screen 1))
- ([screen t] (->> (up screen t)
-                  (grab screen)
-                  (down screen)
-                  (right screen)
-                  (down screen)
-                  (leave screen)
-                  (up screen)
-                  (right screen))))
-
-(defn solution2 [screen entities]
-  (->> (iterate-solution2 screen)
-       (iterate-solution2 screen)
-       (iterate-solution2 screen)
-       (iterate-solution2 screen))
-  entities)
-
-(defn iterate-solution3
-  ([screen entities] (iterate-solution3 screen entities 1))
-  ([screen entities t] (if (karel-find-chip? entities)
-                           (let [time (->> (grab screen t) (up screen))
-                                 next-state (->> (_grab entities) (_up))]
-                              (iterate-solution3 screen next-state time))
-                           (let [time (->> (down screen t))
-                                 next-state (->> (_down entities))]
-                              (if (= next-state entities)
-                                  time
-                                  (iterate-solution3 screen next-state time))))))
 
 (defn next-state3 [entities]
   (if (karel-find-chip? entities)
@@ -245,28 +162,3 @@
         (if (= next-state entities)
             (_right entities)
             (next-state3 next-state)))))
-
-(defn karel-print [entitites]
-  (pprint (filter :karel? entitites)))
-
-(defn solution3 [screen entities]
-  (let [x (_right entities)
-        states (take 8 (iterate next-state3 x))]
-    (->> (right screen 1)
-         (iterate-solution3 screen (nth states 0))
-         (right screen)
-         (iterate-solution3 screen (nth states 1))
-         (right screen)
-         (iterate-solution3 screen (nth states 2))
-         (right screen)
-         (iterate-solution3 screen (nth states 3))
-         (right screen)
-         (iterate-solution3 screen (nth states 4))
-         (right screen)
-         (iterate-solution3 screen (nth states 5))
-         (right screen)
-         (iterate-solution3 screen (nth states 6))
-         (right screen)
-         (iterate-solution3 screen (nth states 7))
-         (leave screen))
-    entities))
