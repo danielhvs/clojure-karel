@@ -14,93 +14,94 @@
 (defn add-state [state]
   (into [] (flatten (conj @queue state))))
 
-(defn up [screen t]
+(defn move-up [screen entities]
   (swap! queue add-state (k/_up entities))
-  (p/add-timer! screen :tick step))
+  (add-timer! screen :tick step))
 
-(defn down [screen t]
+(defn move-down [screen entities]
   (swap! queue add-state (k/_down entities))
-  (p/add-timer! screen :tick step))
+  (add-timer! screen :tick step))
 
-(defn left [screen t]
+(defn move-left [screen entities]
   (swap! queue add-state (k/_left entities))
-  (p/add-timer! screen :tick step))
+  (add-timer! screen :tick step))
 
-(defn right [screen t]
+(defn move-right [screen entities]
   (swap! queue add-state (k/_right entities))
-  (p/add-timer! screen :tick step))
+  (add-timer! screen :tick step))
 
-(defn grab [screen t]
+(defn grab [screen entities]
   (swap! queue add-state (k/_grab entities))
-  (p/add-timer! screen :tick step))
+  (add-timer! screen :tick step))
 
-(defn leave [screen]
+(defn leave [screen entities]
   (swap! queue add-state (k/_drop entities))
-  (p/add-timer! screen :tick step))
+  (add-timer! screen :tick step))
 
 (defn solution1 [screen entities]
-  (->> (right screen entities)
+  (->> (move-right screen entities)
        (grab screen)
-       (right screen)
-       (up screen)
-       (right screen)
-       (right screen)
-       (right screen)
+       (move-right screen)
+       (move-up screen)
+       (move-right screen)
+       (move-right screen)
+       (move-right screen)
        (leave screen))
   entities)
 
 (defn iterate-solution2
- ([screen] (iterate-solution2 screen entities))
- ([screen entities] (->> (up screen entities)
+ ([screen entities] (->> (move-up screen entities)
                          (grab screen)
-                         (down screen)
-                         (right screen)
-                         (down screen)
+                         (move-down screen)
+                         (move-right screen)
+                         (move-down screen)
                          (leave screen)
-                         (up screen)
-                         (right screen))))
+                         (move-up screen)
+                         (move-right screen))))
 
 (defn solution2 [screen entities]
-  (->> (iterate-solution2 screen)
+  (->> (iterate-solution2 screen entities)
        (iterate-solution2 screen)
        (iterate-solution2 screen)
        (iterate-solution2 screen))
   entities)
 
-(defn iterate-solution3
-  ([screen entities] (iterate-solution3 screen entities 1))
-  ([screen entities t] (if (karel-find-chip? entities)
-                           (let [time (->> (grab screen t) (up screen))
+(comment 
+  (defn iterate-solution3
+    ([screen entities] (iterate-solution3 screen entities 1))
+    ([screen entities t] (if (karel-find-chip? entities)
+                           (let [time (->> (grab screen t) (move-up screen))
                                  next-state (->> (_grab entities) (_up))]
-                              (iterate-solution3 screen next-state time))
-                           (let [time (->> (down screen t))
+                             (iterate-solution3 screen next-state time))
+                           (let [time (->> (move-down screen t))
                                  next-state (->> (_down entities))]
-                              (if (= next-state entities)
-                                  time
-                                  (iterate-solution3 screen next-state time))))))
+                             (if (= next-state entities)
+                               time
+                               (iterate-solution3 screen next-state time)))))))
 
 
-(defn solution3 [screen entities]
-  (let [x (_right entities)
-        states (take 8 (iterate next-state3 x))]
-    (->> (right screen 1)
-         (iterate-solution3 screen (nth states 0))
-         (right screen)
-         (iterate-solution3 screen (nth states 1))
-         (right screen)
-         (iterate-solution3 screen (nth states 2))
-         (right screen)
-         (iterate-solution3 screen (nth states 3))
-         (right screen)
-         (iterate-solution3 screen (nth states 4))
-         (right screen)
-         (iterate-solution3 screen (nth states 5))
-         (right screen)
-         (iterate-solution3 screen (nth states 6))
-         (right screen)
-         (iterate-solution3 screen (nth states 7))
-         (leave screen))
-    entities))
+(comment
+  (defn solution3 [screen entities]
+    (let [x (_right entities)
+          states (take 8 (iterate next-state3 x))]
+      (->> (move-right screen 1)
+           (iterate-solution3 screen (nth states 0))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 1))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 2))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 3))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 4))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 5))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 6))
+           (move-right screen)
+           (iterate-solution3 screen (nth states 7))
+           (leave screen))
+      entities)))
 
 (defn create-entity!
   [png data]
@@ -142,10 +143,10 @@
 
   :on-key-down
   (fn [screen entities]
-    (cond (key-pressed? :up) (up screen entities)
-          (key-pressed? :down) (down screen entities)
-          (key-pressed? :left) (left screen entities)
-          (key-pressed? :right) (right screen  entities)
+    (cond (key-pressed? :up) (move-up screen entities)
+          (key-pressed? :down) (move-down screen entities)
+          (key-pressed? :left) (move-left screen entities)
+          (key-pressed? :right) (move-right screen  entities)
           (key-pressed? :g) (grab screen entities)
           (key-pressed? :h) (leave screen entities)
           (key-pressed? :q) (create-scenario k/scenario1 screen)
@@ -153,18 +154,17 @@
           (key-pressed? :w) (create-scenario k/scenario2 screen)
           (key-pressed? :s) (solution2 screen entities)
           (key-pressed? :e) (create-scenario (k/scenario3) screen)
-          (key-pressed? :d) (solution3 screen entities)
-          :else entities)
+          :else entities))
 
-    :on-timer)
+  :on-timer
   (fn [screen entities]
     (case (:id screen)
       :tick (when (complement (empty? @queue))
               (let [state (first @queue)]
                 (swap! queue drop 1)
-                (p/add-timer! screen :tick step))
-              state)
-      entities)
+                (add-timer! screen :tick step)
+                state))
+      entities)))
 
 (defgame clj-karel-game
   :on-create

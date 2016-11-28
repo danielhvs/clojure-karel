@@ -132,27 +132,33 @@
            entities))))
 
 (defn _up [entities]
-  (->> (turn entities)
-       (move)
-       (turn)
-       (turn)
-       (turn)))
+  (let [s1 (turn entities)
+        s2 (move s1)
+        s3 (turn s2)
+        s4 (turn s3)
+        s5 (turn s4)]
+    [s1 s2 s3 s4 s5]))
+
 (defn _down [entities]
-  (->> (turn entities)
-       (turn)
-       (turn)
-       (move)
-       (turn)))
+  (let [s1 (turn entities)
+        s2 (turn s1)
+        s3 (turn s2)
+        s4 (move s3)
+        s5 (turn s4)]
+    [s1 s2 s3 s4 s5]))
+
 (defn _left [entities]
-  (->> (turn entities)
-       (turn)
-       (move)
-       (turn)
-       (turn)))
+  (let [s1 (turn entities)
+        s2 (turn s1)
+        s3 (move s2)
+        s4 (turn s3)
+        s5 (turn s4)]
+    [s1 s2 s3 s4 s5]))
+
 (defn _right [entities]
-   (move entities))
+  [(move entities)])
 (defn _grab [entities]
-  (pick entities))
+  [(pick entities)])
 
 (defn next-state3 [entities]
   (if (karel-find-chip? entities)
