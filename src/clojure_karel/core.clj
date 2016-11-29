@@ -8,7 +8,7 @@
             [clojure-karel.entities :as k]))
 
 (def pixels-per-tile 32)
-(def step 0.05)
+(def step 0.005)
 (def queue (atom []))
 
 (defn remove-state [atom-val]
@@ -17,46 +17,32 @@
 (defn add-state [atom-val state]
   (into state @queue))
 
+(defn execute-move [screen entities f]
+  (let [state (f entities)]
+    (swap! queue add-state state)
+    (add-timer! screen :tick step)
+    entities))
+
 (defn move-up [screen entities]
-  (swap! queue add-state (k/_up entities))
-  (add-timer! screen :tick step)
-  entities)
+  (execute-move screen entities k/_up))
 
 (defn move-down [screen entities]
-  (swap! queue add-state (k/_down entities))
-  (add-timer! screen :tick step)
-  entities)
+  (execute-move screen entities k/_down))
 
 (defn move-left [screen entities]
-  (swap! queue add-state (k/_left entities))
-  (add-timer! screen :tick step)
-  entities)
+  (execute-move screen entities k/_left))
 
 (defn move-right [screen entities]
-  (swap! queue add-state (k/_right entities))
-  (add-timer! screen :tick step)
-  entities)
+  (execute-move screen entities k/_right))
 
 (defn grab [screen entities]
-  (swap! queue add-state (k/_grab entities))
-  (add-timer! screen :tick step)
-  entities)
+  (execute-move screen entities k/_grab))
 
 (defn leave [screen entities]
-  (swap! queue add-state (k/_drop entities))
-  (add-timer! screen :tick step)
-  entities)
+  (execute-move screen entities k/_drop))
 
 (defn solution1 [screen entities]
-  (->> (move-right screen entities)
-       (grab screen)
-       (move-right screen)
-       (move-up screen)
-       (move-right screen)
-       (move-right screen)
-       (move-right screen)
-       (leave screen))
-  entities)
+  (execute-move screen entities k/solution1))
 
 (defn iterate-solution2
  ([screen entities] (->> (move-up screen entities)
