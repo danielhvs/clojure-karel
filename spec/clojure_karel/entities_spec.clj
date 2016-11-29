@@ -42,8 +42,6 @@
   (before
     (def entities [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}
                    {:x 1 :y 1 :z 0 :chip? true}]))
-
-
   (it "karel detects when there is a chip"
       (should= true (karel-find-chip? entities)))
   (it "karel doesn't detects when it is grabbing a chip"
@@ -51,5 +49,16 @@
   (it "karel doesn't detects when there isn't a chip"
       (should= false (karel-find-chip? (move entities)))))
 
+(describe "up returns all states:"
+  (before
+    (def entities [{:x 1 :y 1 :z 0 :angle 0 :karel? true :moving? true}]))
+  (it "returns all karel states"
+      (should= [
+                [{:x 1 :y 1 :z 0 :angle 90 :karel? true :moving? true}]
+                [{:x 1 :y 2 :z 0 :angle 90 :karel? true :moving? true}]
+                [{:x 1 :y 2 :z 0 :angle 180 :karel? true :moving? true}]
+                [{:x 1 :y 2 :z 0 :angle 270 :karel? true :moving? true}]
+                [{:x 1 :y 2 :z 0 :angle 0 :karel? true :moving? true}]
+               ] (_up entities))))
 
 (run-specs)

@@ -15,7 +15,7 @@
   (drop 1 @queue))
 
 (defn add-state [atom-val state]
-  (into [] (flatten (conj @queue state))))
+  (into state @queue))
 
 (defn move-up [screen entities]
   (swap! queue add-state (k/_up entities))
@@ -168,11 +168,12 @@
   :on-timer
   (fn [screen entities]
     (case (:id screen)
-      :tick (when (not (empty? @queue))
+      :tick (if (not (empty? @queue))
               (let [state (first @queue)]
                 (swap! queue remove-state)
                 (add-timer! screen :tick step)
-                state))
+                state)
+              entities)
       entities)))
 
 (defgame clj-karel-game

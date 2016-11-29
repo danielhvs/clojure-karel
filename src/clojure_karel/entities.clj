@@ -122,7 +122,7 @@
                 %)
            entities))))
 
-(defn _drop [entities]
+(defn _leave [entities]
   (let [karel (first (filter :karel? entities))
         karel-pos (select-keys karel [:x :y])]
     (sort-by :z <
@@ -159,6 +159,8 @@
   [(move entities)])
 (defn _grab [entities]
   [(pick entities)])
+(defn _drop [entities]
+  [(_leave entities)])
 
 (defn next-state3 [entities]
   (if (karel-find-chip? entities)
