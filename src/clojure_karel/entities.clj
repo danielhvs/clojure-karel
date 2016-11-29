@@ -181,6 +181,20 @@
         s6 (_right (last s5))
         s7 (_right (last s6))
         s8 (_drop (last s7))
+        ]
+    [s1 s2 s3 s4 s5 s6 s7 s8]))
+
+
+(defn solution2-step [entities]
+  (let [
+        s1 (_up entities)
+        s2 (_grab (last s1))
+        s3 (_down (last s2))
+        s4 (_right (last s3))
+        s5 (_down (last s4))
+        s6 (_drop (last s5))
+        s7 (_up (last s6))
+        s8 (_right (last s7))
         result (-> s1 
                    (into []) 
                    (into s2)
@@ -192,3 +206,15 @@
                    (into s8))]
     [s1 s2 s3 s4 s5 s6 s7 s8]))
 
+(defn solution2 [entities]
+  (let [
+        s1 (solution2-step entities)
+        s2 (solution2-step (last (last s1)))
+        s3 (solution2-step (last (last s2)))
+        s4 (solution2-step (last (last s3)))
+        result (-> s1 
+                   (into [])
+                   (into s2)
+                   (into s3)
+                   (into s4))]
+    result))

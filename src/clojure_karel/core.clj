@@ -44,22 +44,8 @@
 (defn solution1 [screen entities]
   (execute-move screen entities k/solution1))
 
-(defn iterate-solution2
- ([screen entities] (->> (move-up screen entities)
-                         (grab screen)
-                         (move-down screen)
-                         (move-right screen)
-                         (move-down screen)
-                         (leave screen)
-                         (move-up screen)
-                         (move-right screen))))
-
 (defn solution2 [screen entities]
-  (->> (iterate-solution2 screen entities)
-       (iterate-solution2 screen)
-       (iterate-solution2 screen)
-       (iterate-solution2 screen))
-  entities)
+  (execute-move screen entities k/solution2))
 
 (comment 
   (defn iterate-solution3
