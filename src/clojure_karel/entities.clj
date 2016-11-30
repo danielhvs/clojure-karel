@@ -162,15 +162,6 @@
 (defn _drop [entities]
   [(_leave entities)])
 
-(defn next-state3 [entities]
-  (if (karel-find-chip? entities)
-      (let [next-state (->> (_grab entities) (_up))]
-        (next-state3 next-state))
-      (let [next-state (->> (_down entities))]
-        (if (= next-state entities)
-            (_right entities)
-            (next-state3 next-state)))))
-
 (defn solution1 [entities]
   (let [s1 (_right entities)
         s2 (_grab (last s1))
@@ -203,4 +194,43 @@
                    (into s2)
                    (into s3)
                    (into s4))]
+    result))
+
+(defn next-state3 [_entities]
+  (loop [steps 0 states [_entities] entities _entities]
+    (if (karel-find-chip? entities)
+      (let [s1 (_grab entities)
+            s2 (_up (last s1))
+            next-state (-> s1 (into []) (into s2))]
+        (recur (inc steps) (into states next-state) (last next-state)))
+      (let [s1 (_down entities)
+            next-state (-> s1 (into []))]
+        (if (zero? steps)
+          states
+          (recur (dec steps) (into states next-state) (last next-state)))))))
+
+(defn solution3 [entities]
+  (let [
+        s1 [entities]
+        s2 (next-state3 (last (_right (last s1))))
+        s3 (next-state3 (last (_right (last s2))))
+        s4 (next-state3 (last (_right (last s3))))
+        s5 (next-state3 (last (_right (last s4))))
+        s6 (next-state3 (last (_right (last s5))))
+        s7 (next-state3 (last (_right (last s6))))
+        s8 (next-state3 (last (_right (last s7))))
+        s9 (next-state3 (last (_right (last s8))))
+        s10 (_drop (last s9))
+        result (-> s1 
+                   (into [])
+                   (into s2)
+                   (into s3)
+                   (into s4)
+                   (into s5)
+                   (into s6)
+                   (into s7)
+                   (into s8)
+                   (into s9)
+                   (into s10)
+                   )] 
     result))

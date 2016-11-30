@@ -47,6 +47,9 @@
 (defn solution2 [screen entities]
   (execute-move screen entities k/solution2))
 
+(defn solution3 [screen entities]
+  (execute-move screen entities k/solution3))
+
 (comment 
   (defn iterate-solution3
     ([screen entities] (iterate-solution3 screen entities 1))
@@ -60,29 +63,6 @@
                                time
                                (iterate-solution3 screen next-state time)))))))
 
-
-(comment
-  (defn solution3 [screen entities]
-    (let [x (_right entities)
-          states (take 8 (iterate next-state3 x))]
-      (->> (move-right screen 1)
-           (iterate-solution3 screen (nth states 0))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 1))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 2))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 3))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 4))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 5))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 6))
-           (move-right screen)
-           (iterate-solution3 screen (nth states 7))
-           (leave screen))
-      entities)))
 
 (defn create-entity!
   [png data]
@@ -135,6 +115,7 @@
           (key-pressed? :w) (create-scenario k/scenario2 screen)
           (key-pressed? :s) (solution2 screen entities)
           (key-pressed? :e) (create-scenario (k/scenario3) screen)
+          (key-pressed? :d) (solution3 screen entities)
           :else entities))
 
   :on-timer
