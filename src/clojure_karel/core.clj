@@ -50,20 +50,6 @@
 (defn solution3 [screen entities]
   (execute-move screen entities k/solution3))
 
-(comment 
-  (defn iterate-solution3
-    ([screen entities] (iterate-solution3 screen entities 1))
-    ([screen entities t] (if (karel-find-chip? entities)
-                           (let [time (->> (grab screen t) (move-up screen))
-                                 next-state (->> (_grab entities) (_up))]
-                             (iterate-solution3 screen next-state time))
-                           (let [time (->> (move-down screen t))
-                                 next-state (->> (_down entities))]
-                             (if (= next-state entities)
-                               time
-                               (iterate-solution3 screen next-state time)))))))
-
-
 (defn create-entity!
   [png data]
   (let [part (texture png)
