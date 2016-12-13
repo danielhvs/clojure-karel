@@ -1,5 +1,4 @@
-(ns karel.core
-  (:require [clojure.pprint :refer :all]))
+(ns karel.core)
 
 (defn in? [collection element]
   (->> (some #(= % element) collection)
