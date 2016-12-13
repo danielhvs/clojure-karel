@@ -1,4 +1,4 @@
-(ns clojure-karel.entities
+(ns karel.core
   (:require [clojure.pprint :refer :all]))
 
 (defn in? [collection element]

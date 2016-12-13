@@ -1,6 +1,6 @@
-(ns clojure-karel.entities-spec
+(ns karel.core-spec
   (:require [speclj.core :refer :all]
-            [clojure-karel.entities :refer :all]))
+            [karel.core :refer :all]))
 
 (describe "karel moving:"
   (before

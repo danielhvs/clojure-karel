@@ -1,11 +1,11 @@
-(ns clojure-karel.core
+(ns desktop.core
   (:require [play-clj.core :refer :all]
             [clojure.pprint :refer :all]
             [play-clj.ui :refer :all]
             [play-clj.g2d :refer :all]
             [play-clj.g2d-physics :refer :all]
             [play-clj.math :refer :all]
-            [clojure-karel.entities :as k]))
+            [karel.core :as k]))
 
 (def pixels-per-tile 32)
 (def step 0.005)
