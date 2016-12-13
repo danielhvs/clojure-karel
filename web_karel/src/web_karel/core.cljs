@@ -10,6 +10,7 @@
 (defonce app-state (atom {:text "Karel the Robot learns Clojure"}))
 (defn karel-window []
   [:center
+   [:h1 (:text @app-state)]
    [:h1
     [:button
      {:on-click
@@ -19,10 +20,15 @@
    [:h1
     [:button
      {:on-click
+      (fn level-1-click [e]
+        (swap! app-state assoc :text (str (k/solution1 k/scenario1))))}
+     "Solution 1"]]
+   [:h1
+    [:button
+     {:on-click
       (fn level-2-click [e]
         (swap! app-state assoc :text (str k/scenario2)))}
      "Level 2"]]
-   [:h1 (:text @app-state)]
    ])
 
 
