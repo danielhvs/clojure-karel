@@ -8,12 +8,11 @@
                  [com.badlogicgames.gdx/gdx-bullet-platform "1.9.3" :classifier "natives-desktop"]
                  [com.badlogicgames.gdx/gdx-platform "1.9.3" :classifier "natives-desktop"]
                  [org.clojure/clojure "1.8.0"]
-                 [karel "1.0.0"]
                  [play-clj "1.1.1"]]
 
   :profiles {:dev {:plugins [[lein-kibit "0.1.2"]]}}
 
-  :source-paths ["src"]
+  :source-paths ["src" "../karel/src"]
   :javac-options ["-target" "1.6" "-source" "1.6" "-Xlint:-options"]
   :aot [desktop.desktop-launcher]
   :main desktop.desktop-launcher)

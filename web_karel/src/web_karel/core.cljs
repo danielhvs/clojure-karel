@@ -1,16 +1,24 @@
 (ns web_karel.core
-  (:require [reagent.core :as reagent :refer [atom]]
-            [karel.karel :as k]))
+  (:require [reagent.core :as r :refer [atom]]
+            [karel.core :as k]))
 
 (enable-console-print!)
 
 (println "This text is printed from src/web_karel/core.cljs. Go ahead and edit it and see reloading in action.")
 
+(defn timer-component []
+  (let [n (r/atom 0)]
+    (fn []
+      (js/setTimeout #(swap! n inc) 1000)
+      [:h1
+       [:div 
+        (str (get (k/solution1 k/scenario1) @n))]])))
+
 ;; define your app data so that it doesn't get over-written on reload
 (defonce app-state (atom {:text "Karel the Robot learns Clojure"}))
 (defn karel-window []
   [:center
-   [:h1 (:text @app-state)]
+   [timer-component]
    [:h1
     [:button
      {:on-click
@@ -29,10 +37,10 @@
       (fn level-2-click [e]
         (swap! app-state assoc :text (str k/scenario2)))}
      "Level 2"]]
+   [:h1 (:text @app-state)]
    ])
 
-
-(reagent/render-component [karel-window]
+(r/render-component [karel-window timer-component]
                           (. js/document (getElementById "app")))
 
   ;; optionally touch your app-state to force rerendering depending on
