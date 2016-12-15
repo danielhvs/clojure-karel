@@ -2,24 +2,40 @@
   (:require [reagent.core :as r :refer [atom]]
             [karel.core :as k]))
 
-(def board-size 3)
+(def board-size 16)
 (enable-console-print!)
 
 (println "This text is printed from src/web_karel/core.cljs. Go ahead and edit it and see reloading in action.")
 
+
+(defn create-entity [component entity]
+  [component (:x entity) (:y entity)])
+
+(defn create-game-entity [scenario key-code component]
+  (->> (filter key-code scenario)
+       (map #(create-entity component %))))
+
 (defn blank [i j]
   [:rect
-   {:width 0.9
-    :height 0.9
+   {:width 0.95
+    :height 0.95
     :fill "green"
     :x (+ 0.05 i)
     :y (+ 0.05 j)}])
+
+(defn blank-goal [i j]
+  [:rect
+   {:width 0.85
+    :height 0.85
+    :fill "orange"
+    :x (+ 0.10 i)
+    :y (+ 0.10 j)}])
 
 (defn circle [i j]
   [:circle
    {:r 0.35
     :stroke "black"
-    :stroke-width 0.2
+    :stroke-width 0.1
     :fill "none"
     :cx (+ 0.5 i)
     :cy (+ 0.5 j)}])
@@ -41,28 +57,46 @@
        [:div 
         (str (get (k/solution1 k/scenario1) @n))]])))
 
+(defn create-scenario [scenario]
+  [(create-game-entity scenario :chip? circle)
+   (create-game-entity scenario :karel? cross)
+   (create-game-entity scenario :goal? blank-goal)
+   (create-game-entity scenario :wall? blank)])
+
+(defn make-scenario-svg [scenario]
+  (into [:svg
+         {:view-box (str "0 0 " board-size " " board-size)
+          :width 750
+          :height 750}]
+        (create-scenario scenario)))
+
 ;; define your app data so that it doesn't get over-written on reload
-(defonce app-state (atom {:text "Karel the Robot learns Clojure"}))
+(defonce app-state (atom {:text "Karel the Robot learns Clojure" :scenario []}))
 (defn karel-window []
   [:center
-   (into [:svg
-          {:view-box (str "0 0 " board-size " " board-size)
-           :width 500
-           :height 500}]
-         (for [i (range 2)] [cross i i]))
    [:h1
     [:button
      {:on-click
-      (fn level-1-click [e]
-        (swap! app-state assoc :text (str k/scenario1)))}
+      (fn [e]
+        (swap! app-state assoc :text k/scenario1 :scenario k/scenario1))}
      "Level 1"]]
    [:h1
     [:button
      {:on-click
-      (fn level-2-click [e]
-        (swap! app-state assoc :text (str k/scenario2)))}
+      (fn [e]
+        (swap! app-state assoc :text k/scenario2 :scenario k/scenario2))}
      "Level 2"]]
-   [:h1 (:text @app-state)]
+   [:h1
+    [:button
+     {:on-click
+      (fn [e]
+        (swap! app-state assoc :text k/scenario1 :scenario (k/scenario3)))}
+     "Level 3"]]
+   (into [:svg
+          {:view-box (str "0 0 " board-size " " board-size)
+           :width 750
+           :height 750}]
+         (create-scenario (:scenario @app-state)))
    ])
 
 (r/render-component [karel-window timer-component]
@@ -72,5 +106,5 @@
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 (defn on-js-reload []
-  (println "reloaded!"))
+  (println (:scenario @app-state)))
   
