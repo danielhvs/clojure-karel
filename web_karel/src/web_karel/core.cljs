@@ -77,29 +77,27 @@
           :height 750}]
         (create-scenario scenario)))
 
-(defn karel-window []
-  [:center
+(defn karel-window []  
+  [:div
    [timer-component]
    [:h1
     [:button
      {:on-click
       (fn [e]
         (swap! app-state assoc :level 1 :scenario k/scenario1))}
-     "Level 1"]]
-   [:h1
+     "Level 1"]
     [:button
      {:on-click
       (fn [e]
         (swap! app-state assoc :solution (k/solution1 (:scenario @app-state)))
-       )}
+        )}
      "Solution 1"]]
    [:h1
     [:button
      {:on-click
       (fn [e]
         (swap! app-state assoc :level 2 :scenario k/scenario2))}
-     "Level 2"]]
-   [:h1
+     "Level 2"]
     [:button
      {:on-click
       (fn [e]
@@ -111,22 +109,23 @@
      {:on-click
       (fn [e]
         (swap! app-state assoc :level 3 :scenario (k/scenario3)))}
-     "Level 3"]]
-   [:h1
+     "Level 3"]
     [:button
      {:on-click
       (fn [e]
         (swap! app-state assoc :solution (k/solution3 (:scenario @app-state)))
         )}
      "Solution 3"]]
-   (into [:svg
-          {:view-box (str "0 0 " board-size " " board-size)
-           :width 750
-           :height 750}]
-         (create-scenario (:scenario @app-state)))
+   [:div
+    [:center
+     (into [:svg
+            {:view-box (str "0 0 " board-size " " board-size)
+             :width 750
+             :height 750}]
+           (create-scenario (:scenario @app-state)))]]
    ])
 
-(r/render-component [karel-window timer-component]
+(r/render-component [karel-window]
                           (. js/document (getElementById "app")))
 
   ;; optionally touch your app-state to force rerendering depending on
