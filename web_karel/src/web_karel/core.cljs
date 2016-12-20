@@ -47,7 +47,7 @@
        :stroke-width 0.3
        :transform
        (str "translate(" (+ 0.5 i) "," (+ 0.5 j) ") "
-            "scale(0.3)")}
+            "scale(0.3) ")}
    [:line {:x1 -1 :y1 -1 :x2 1 :y2 1}]
    [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
 
@@ -77,45 +77,32 @@
           :height 750}]
         (create-scenario scenario)))
 
+(defn solutions [n] 
+  (get [k/solution1 k/solution2 k/solution3] (dec n)))
+
+(defn scenarios [n] 
+  (get [k/scenario1 k/scenario2 (k/scenario3)] (dec n)))
+
+(defn level [n]
+  {:solution (solutions n) :scenario (scenarios n)})
+
 (defn karel-window []  
   [:div
    [timer-component]
-   [:h1
-    [:button
-     {:on-click
-      (fn [e]
-        (swap! app-state assoc :level 1 :scenario k/scenario1))}
-     "Level 1"]
-    [:button
-     {:on-click
-      (fn [e]
-        (swap! app-state assoc :solution (k/solution1 (:scenario @app-state)))
-        )}
-     "Solution 1"]]
-   [:h1
-    [:button
-     {:on-click
-      (fn [e]
-        (swap! app-state assoc :level 2 :scenario k/scenario2))}
-     "Level 2"]
-    [:button
-     {:on-click
-      (fn [e]
-        (swap! app-state assoc :solution (k/solution2 (:scenario @app-state)))
-        )}
-     "Solution 2"]]
-   [:h1
-    [:button
-     {:on-click
-      (fn [e]
-        (swap! app-state assoc :level 3 :scenario (k/scenario3)))}
-     "Level 3"]
-    [:button
-     {:on-click
-      (fn [e]
-        (swap! app-state assoc :solution (k/solution3 (:scenario @app-state)))
-        )}
-     "Solution 3"]]
+   (for [n (map inc (take 3 (range)))]
+     (let [l (level n)]
+       [:h1 
+        [:button 
+         {:on-click 
+          (fn [e] 
+            (swap! app-state assoc :level (:level l) :scenario (:scenario l)))} 
+         (str "Level " n)]
+        [:button 
+         {:on-click 
+          (fn [e] 
+            (swap! app-state assoc :solution ((:solution l) (:scenario @app-state)))
+            )}
+         (str "Solution " n)]]))
    [:div
     [:center
      (into [:svg
