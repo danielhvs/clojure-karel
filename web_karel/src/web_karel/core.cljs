@@ -47,7 +47,7 @@
        :stroke-width 0.3
        :transform
        (str "translate(" (+ 0.5 i) "," (+ 0.5 j) ") "
-            "scale(0.3) ")}
+            "scale(0.3)")}
    [:line {:x1 -1 :y1 -1 :x2 1 :y2 1}]
    [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
 
@@ -86,6 +86,16 @@
 (defn level [n]
   {:solution (solutions n) :scenario (scenarios n)})
 
+(defn width [scenario] (let [xs (map :x (filter :wall? scenario))]
+  (if (empty? xs) 
+    board-size
+    (inc (apply max xs)))))
+
+(defn height [scenario] (let [ys (map :y (filter :wall? scenario))]
+  (if (empty? ys) 
+    board-size
+    (inc (apply max ys)))))
+
 (defn karel-window []  
   [:div
    [timer-component]
@@ -105,11 +115,15 @@
          (str "Solution " n)]]))
    [:div
     [:center
-     (into [:svg
-            {:view-box (str "0 0 " board-size " " board-size)
-             :width 750
-             :height 750}]
-           (create-scenario (:scenario @app-state)))]]
+     (let [width (->> @app-state (:scenario) (width))
+height (->> @app-state (:scenario) (height))
+]
+       (into [:svg
+              {:view-box (str "0 0 " width " " height)
+               :width 500 :style {:border "0px solid"}
+               :preserveAspectRatio "xMinYMin meet"
+               :height 500}]
+             (create-scenario (:scenario @app-state))))]]
    ])
 
 (r/render-component [karel-window]
