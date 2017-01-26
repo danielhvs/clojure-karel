@@ -3,7 +3,6 @@
             [karel.core :as k]))
 
 (def board-size 1)
-(def SIZE 50)
 (def MIN_LEVEL 1)
 (def MAX_LEVEL 3)
 (enable-console-print!)
@@ -18,7 +17,7 @@
   {:level n :solution (solutions n) :scenario (scenarios n)})
 
 ;; define your app data so that it doesn't get over-written on reload
-(defonce app-state (atom {:level 1 :scenario (:scenario (level 1)) :solution (:solution (level 1))}))
+(defonce app-state (atom {:size 50 :level 1 :scenario (:scenario (level 1)) :solution (:solution (level 1))}))
 
 (defn create-entity [component entity]
   [component (:x entity) (:y entity)])
@@ -104,6 +103,7 @@
 (defn karel-window []  
   [:div
    [:div 
+    "Level "
     [:button 
      {:on-click 
       (fn [e] 
@@ -126,7 +126,21 @@
         )}
      (str "Solution")]
     [:center (str "Level " (:level @app-state))]]
-   [timer-component]
+   [:div 
+    "Size "
+    [:button 
+     {:on-click 
+      (fn [e] 
+        (swap! app-state assoc :size (- (:size @app-state) 10)))
+      :disabled (button-disabled? app-state)}
+     (str "-")]
+    [:button
+     {:on-click 
+      (fn [e] 
+        (swap! app-state assoc :size (+ (:size @app-state) 10)))
+      :disabled (button-disabled? app-state)}
+     (str "+")]
+]
    [:div
     [:center
      (let [width (->> @app-state (:scenario) (width))
@@ -134,11 +148,11 @@
            ]
        (into [:svg
               {:view-box (str "0 0 " width " " height)
-               :width (* SIZE width) :style {:border "1px solid" :color "green"}
+               :width (* (:size @app-state) width) :style {:border "1px solid" :color "green"}
                :preserveAspectRatio "xMinYMin meet"
-               :height (* SIZE height)}]
+               :height (* (:size @app-state) height)}]
              (create-scenario (:scenario @app-state))))]]
-   
+   [timer-component]
    ])
 
 (r/render-component [karel-window]
