@@ -8,7 +8,7 @@
 (println "This text is printed from src/web_karel/core.cljs. Go ahead and edit it and see reloading in action.")
 
 ;; define your app data so that it doesn't get over-written on reload
-(defonce app-state (atom {:text "Karel the Robot learns Clojure" :scenario [] :solution []}))
+(defonce app-state (atom {:scenario [] :solution []}))
 
 (defn create-entity [component entity]
   [component (:x entity) (:y entity)])
@@ -52,12 +52,13 @@
    [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
 
 (defn timer-component []
-  (let [n (r/atom 0)]
+  (let [n (r/atom 0)
+        level (->> @app-state (:level))]
     (fn []
       (js/setTimeout #(swap! n inc) 1000)
       [:h1
        [:div 
-        (let [scenario (if (->> @app-state (:level) (< 2)) 
+        (let [scenario (if (->> level (< 2))
                          (get (:solution @app-state) @n)
                          (first (get (:solution @app-state) @n)))]
           (if scenario
@@ -84,20 +85,23 @@
   (get [k/scenario1 k/scenario2 (k/scenario3)] (dec n)))
 
 (defn level [n]
-  {:solution (solutions n) :scenario (scenarios n)})
+  {:level n :solution (solutions n) :scenario (scenarios n)})
 
-(defn width [scenario] (let [xs (map :x (filter :wall? scenario))]
-  (if (empty? xs) 
-    board-size
-    (inc (apply max xs)))))
+(defn width [scenario] 
+  (let [xs (map :x (filter :wall? scenario))]
+    (if (empty? xs) 
+      board-size
+      (inc (apply max xs)))))
 
-(defn height [scenario] (let [ys (map :y (filter :wall? scenario))]
-  (if (empty? ys) 
-    board-size
-    (inc (apply max ys)))))
+(defn height [scenario] 
+  (let [ys (map :y (filter :wall? scenario))]
+    (if (empty? ys) 
+      board-size
+      (inc (apply max ys)))))
 
 (defn karel-window []  
   [:div
+   [:div [:left (str "LEVEL:" (:level @app-state))]]
    [timer-component]
    (for [n (map inc (take 3 (range)))]
      (let [l (level n)]
@@ -116,15 +120,16 @@
    [:div
     [:center
      (let [width (->> @app-state (:scenario) (width))
-height (->> @app-state (:scenario) (height))
-]
+           height (->> @app-state (:scenario) (height))
+           ]
        (into [:svg
               {:view-box (str "0 0 " width " " height)
-               :width 500 :style {:border "0px solid"}
+               :width (* 50 width) :style {:border "5px solid" :color "black"}
                :preserveAspectRatio "xMinYMin meet"
-               :height 500}]
+               :height (* 50 height)}]
              (create-scenario (:scenario @app-state))))]]
-   ])
+   
+])
 
 (r/render-component [karel-window]
                           (. js/document (getElementById "app")))
@@ -133,5 +138,8 @@ height (->> @app-state (:scenario) (height))
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 (defn on-js-reload []
-  (println (str "SOLUTION:" (:solution @app-state))))
+  (println (str "APP-STATE:" @app-state)))
+
+
+  
   
