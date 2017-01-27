@@ -62,17 +62,17 @@
 
 (defn timer-component []
   (let [n (r/atom 0)
-        level (->> @app-state (:level))]
+        l (->> @app-state (:level))]
     (fn []
       (js/setTimeout #(swap! n inc) 1000)
       [:h1
        [:div 
-        (let [scenario (if (->> level (< 2))
-                         (get (:solution @app-state) @n)
-                         (first (get (:solution @app-state) @n)))]
+        (let [scenario (if (< l 3) 
+                         (first (get (:solution @app-state) @n))
+                         (get (:solution @app-state) @n))]
           (if scenario
-            (swap! app-state assoc :scenario scenario :busy? true) 
-            (do (reset! n 0) (swap! app-state dissoc :solution :busy? false))))]])))
+            (do (swap! app-state assoc :scenario scenario :busy? true) (str "Scenario: " scenario)) 
+            (do (reset! n 0) (swap! app-state dissoc :solution :busy? false) "")))]])))
 
 (defn create-scenario [scenario]
   [(create-game-entity scenario :goal? blank-goal)
