@@ -163,7 +163,3 @@
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 (defn on-js-reload []
   (println (str "APP-STATE:" @app-state)))
-
-
-  
-  
